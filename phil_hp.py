@@ -64,6 +64,7 @@ the cycle.
     fig.update_layout(
         xaxis_title = 'Outdoor Temperature, deg F',
         yaxis_title = 'COP',
+        coloraxis_colorbar_title_text = 'Compressor Power'
     )
     streamlit.write(fig)
 
@@ -76,5 +77,6 @@ the cycle.
     fig.update_layout(
         xaxis_title = 'Heat Pump Entering - Outdoor Temperature, deg F',
         yaxis_title = 'COP',
+        coloraxis_colorbar_title_text = 'Compressor Power'
     )
     streamlit.write(fig)
