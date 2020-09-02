@@ -66,3 +66,15 @@ the cycle.
         yaxis_title = 'COP',
     )
     streamlit.write(fig)
+
+    streamlit.markdown("""## COP vs. (Heat Pump Entering - Outdoor Temp)
+""")
+    fig = px.scatter(dfr, x='entering_out_dt', y='cop', 
+        color='power', 
+        hover_data=['date_time_str', 'entering_t', 'out_t', 'flow', 'heat_dt'], 
+        color_continuous_scale="Bluered_r")
+    fig.update_layout(
+        xaxis_title = 'Heat Pump Entering - Outdoor Temperature, deg F',
+        yaxis_title = 'COP',
+    )
+    streamlit.write(fig)
