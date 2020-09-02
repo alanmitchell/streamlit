@@ -48,6 +48,7 @@ def run():
             rec['entering_out_dt'] = rec['entering_t'] - rec['out_t']
             rec['date_time'] =  pd.to_datetime((cycle_en - cycle_st) / 2.0 + cycle_st)
             rec['date_time_str'] = rec['date_time'].strftime('%D %H:%M:%S')
+            rec['cycle_minutes'] = (cycle_en - cycle_st) / 1e9 / 60.0
             recs.append(rec)
 
         dfr = pd.DataFrame(recs)
@@ -59,7 +60,7 @@ the cycle.
 """)
     fig = px.scatter(dfr, x='out_t', y='cop', 
         color='power', 
-        hover_data=['date_time_str', 'entering_t', 'flow', 'heat_dt'], 
+        hover_data=['date_time_str', 'entering_t', 'flow', 'heat_dt', 'cycle_minutes'], 
         color_continuous_scale="Bluered_r")
     fig.update_layout(
         xaxis_title = 'Outdoor Temperature, deg F',
@@ -72,7 +73,7 @@ the cycle.
 """)
     fig = px.scatter(dfr, x='entering_out_dt', y='cop', 
         color='power', 
-        hover_data=['date_time_str', 'entering_t', 'out_t', 'flow', 'heat_dt'], 
+        hover_data=['date_time_str', 'entering_t', 'out_t', 'flow', 'heat_dt', 'cycle_minutes'], 
         color_continuous_scale="Bluered_r")
     fig.update_layout(
         xaxis_title = 'Heat Pump Entering - Outdoor Temperature, deg F',
