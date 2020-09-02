@@ -13,7 +13,7 @@ def run():
     refresh = streamlit.sidebar.button('Refresh Data')
     if dfr is None or refresh:
         server = bmondata.Server('https://bmon.analysisnorth.com')
-        start_ts = '2020-09-01'
+        start_ts = '2020-09-02'
         df = server.sensor_readings([
                 ('phil_hp_out_13_btu_heat', 'heat'),
                 ('phil_hp_out_13_btu_thot', 'leaving_t'),
@@ -69,8 +69,8 @@ the cycle.
     )
     streamlit.write(fig)
 
-    streamlit.markdown("""## COP vs. (Heat Pump Entering - Outdoor Temp)
-""")
+    streamlit.markdown('## COP vs. (Heat Pump Entering - Outdoor Temp')
+
     fig = px.scatter(dfr, x='entering_out_dt', y='cop', 
         color='power', 
         hover_data=['date_time_str', 'entering_t', 'out_t', 'flow', 'heat_dt', 'cycle_minutes'], 
