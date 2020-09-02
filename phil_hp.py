@@ -52,6 +52,14 @@ def run():
 
         dfr = pd.DataFrame(recs)
 
+    streamlit.markdown("""## COP vs. Outdoor Temperature
+
+Each point is one cycle.  The color of the point indicates the compressor power during
+the cycle.
+""")
     fig = px.scatter(dfr, x='out_t', y='cop', color='power', hover_data=['date_time_str'], color_continuous_scale="Bluered_r")
-    streamlit.markdown('## COP vs. Outdoor Temperature')
+    fig.update_layout(
+        xaxis_title = 'Outdoor Temperature, deg F',
+        yaxis_title = 'COP',
+    )
     streamlit.write(fig)
