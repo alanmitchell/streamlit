@@ -106,7 +106,6 @@ Cycle Length: %{customdata[7]:,.0f} minutes
 """
     fig = px.scatter(dfr, x='out_t', y='cop', 
         color='power', size='size',
-        hover_data=['date_time_str', 'entering_t', 'flow', 'heat_dt', 'cycle_minutes'], 
         color_continuous_scale="Bluered_r")
     fig.update_layout(
         xaxis_title = 'Outdoor Temperature, deg F',
@@ -136,7 +135,6 @@ Cycle Length: %{customdata[7]:,.0f} minutes
 
     fig = px.scatter(dfr, x='entering_out_dt', y='cop', 
         color='power', size='size', 
-        hover_data=['date_time_str', 'entering_t', 'out_t', 'flow', 'heat_dt', 'cycle_minutes'], 
         color_continuous_scale="Bluered_r")
     fig.update_layout(
         xaxis_title = 'Heat Pump Entering - Outdoor Temperature, deg F',
