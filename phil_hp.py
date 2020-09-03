@@ -119,7 +119,7 @@ Cycle Length: %{customdata[7]:,.0f} minutes
     )
     streamlit.plotly_chart(fig, use_container_width=True)
 
-    streamlit.markdown('## COP vs. (Heat Pump Entering - Outdoor Temp')
+    streamlit.markdown('## COP vs. (Heat Pump Entering - Outdoor Temp)')
 
     # Template for the hover text:
     hover_tmpl = """%{customdata[0]} <br>
