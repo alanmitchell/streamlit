@@ -3,10 +3,18 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import bmondata
+from dateutil.parser import parse
+
+# A list of date ranges to exclude from the cycle analysis.  If the midpoint of the cycle
+# falls in any one of the following ranges, it is not included.
+DATES_TO_REMOVE = (
+    ('2020-09-07 11:00', '2020-09-07 16:30'),
+)
 
 dfr = None
 
 def run():
+
     global dfr
     
     streamlit.markdown("# Phil's Heat Pump Data")
@@ -38,8 +46,21 @@ def run():
         recs = []
         for cycle_st, cycle_en in cycles:
             query_expr = '@cycle_st <= index < @cycle_en'
+
+            date_time = pd.to_datetime((cycle_en - cycle_st) / 2.0 + cycle_st)
+            # check to see if this cycle falls in one of the intervals that should be excluded
+            exclude_cycle = False
+            for excl_st, excl_en in DATES_TO_REMOVE:
+                if date_time >= parse(excl_st) and date_time <= parse(excl_en):
+                    exclude_cycle = True
+            if exclude_cycle:
+                continue
+
+            rec = {'date_time': date_time}
+            rec['date_time_str'] = rec['date_time'].strftime('%-m/%-d/%y %-I:%M %p')
+            rec['cycle_minutes'] = float((cycle_en - cycle_st)) / 1e9 / 60.0
             
-            rec = {'power': df_pwr.query(query_expr).power.mean()}
+            rec['power'] = df_pwr.query(query_expr).power.mean()
 
             df_cycle = df.query(query_expr).mean()
             for fld in ('heat', 'flow', 'entering_t', 'leaving_t', 'out_t'):
@@ -47,9 +68,6 @@ def run():
             rec['cop'] = rec['heat'] / rec['power'] / 3.413
             rec['heat_dt'] = rec['leaving_t'] - rec['entering_t']
             rec['entering_out_dt'] = rec['entering_t'] - rec['out_t']
-            rec['date_time'] =  pd.to_datetime((cycle_en - cycle_st) / 2.0 + cycle_st)
-            rec['date_time_str'] = rec['date_time'].strftime('%-m/%-d/%y %-I:%M %p')
-            rec['cycle_minutes'] = float((cycle_en - cycle_st)) / 1e9 / 60.0
             recs.append(rec)
 
         dfr = pd.DataFrame(recs)
