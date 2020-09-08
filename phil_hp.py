@@ -98,6 +98,8 @@ the cycle.  Larger dots are more recent cycles.
     heat_dt = dfr.heat_dt.values
     date_time_str = dfr.date_time_str.values
     cycle_minutes = dfr.cycle_minutes.values
+    cop = dfr.cop.values
+    power = dfr.power.values
 
     customdata = np.dstack((
         date_time_str,      # 0
@@ -108,13 +110,15 @@ the cycle.  Larger dots are more recent cycles.
         entering_t,         # 5
         heat_dt,            # 6
         cycle_minutes,      # 7
+        cop,                # 8
+        power,              # 9
     ))[0]
 
     # Template for the hover text:
     hover_tmpl = """%{customdata[0]} <br>
-Outdoor Temperature: %{x:.1f} F <br>
-COP: %{y:.2f} <br>
-Power: %{marker.color:,.0f} W <br>
+Outdoor Temperature: %{customdata[2]:.1f} F <br>
+COP: %{customdata[8]:.2f} <br>
+Power: %{customdata[9]:,.0f} W <br>
 Heat Output: %{customdata[1]:,.0f} BTU/hour <br>
 Entering - Outside Temp: %{customdata[3]:.1f} F <br>
 Flow: %{customdata[4]:.1f} gpm <br>
@@ -137,19 +141,6 @@ Cycle Length: %{customdata[7]:,.0f} minutes
     streamlit.plotly_chart(fig, use_container_width=True)
 
     streamlit.markdown('## COP vs. (Heat Pump Entering - Outdoor Temp)')
-
-    # Template for the hover text:
-    hover_tmpl = """%{customdata[0]} <br>
-Outdoor Temperature: %{customdata[2]:.1f} F <br>
-COP: %{y:.2f} <br>
-Power: %{marker.color:,.0f} W <br>
-Heat Output: %{customdata[1]:,.0f} BTU/hour <br>
-Entering - Outside Temp: %{x:.1f} F <br>
-Flow: %{customdata[4]:.1f} gpm <br>
-HP Entering Temp: %{customdata[5]:.1f} F <br>
-HP Delta Temp: %{customdata[6]:.1f} F <br>
-Cycle Length: %{customdata[7]:,.0f} minutes
-"""
 
     fig = px.scatter(dfr, x='entering_out_dt', y='cop', 
         color='power', size='size', 
