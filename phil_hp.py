@@ -22,7 +22,7 @@ def run():
     refresh = streamlit.sidebar.button('Refresh Data')
     if dfr is None or refresh:
         server = bmondata.Server('https://bmon.analysisnorth.com')
-        start_ts = '2020-09-02'
+        start_ts = '2020-09-07 16:30'
         df = server.sensor_readings([
                 ('phil_hp_out_13_btu_heat', 'heat'),
                 ('phil_hp_out_13_btu_thot', 'leaving_t'),
