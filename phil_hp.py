@@ -30,6 +30,9 @@ def run():
                 ('phil_hp_out_13_btu_pulse', 'flow'),
                 ('phil_hp_pwr_10187_temp', 'out_t'),
             ], start_ts=start_ts)
+        # found that sometimes outdoor temperature misses readings, so interpolate it.
+        # But, should keep an eye on it to ensure not too much interpolation is going on.
+        df['out_t'] = df.out_t.interpolate(method='time')
         df_pwr = server.sensor_readings([
                 ('phil_hp_pwr_16_pulse', 'power'),
             ], start_ts=start_ts)
