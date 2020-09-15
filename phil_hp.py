@@ -48,7 +48,13 @@ def run():
 
         recs = []
         for cycle_st, cycle_en in cycles:
+            # Create two query expressions, one that captures the cycle as defined by the
+            # electrical power cycle, but another "extended" cycle that adds 3 minutes to the 
+            # cycle to capture any residual heat that occurs at the end of the cycle.  Use
+            # the extended cycle to calculate the COP.
             query_expr = '@cycle_st <= index < @cycle_en'
+            cycle_en_ext = cycle_en + np.timedelta64(3, 'm')       # extended cycle has end time 3 minutes later
+            query_expr_ext = '@cycle_st <= index < @cycle_en_ext'
 
             date_time = pd.to_datetime((cycle_en - cycle_st) / 2.0 + cycle_st)
             # check to see if this cycle falls in one of the intervals that should be excluded
@@ -63,14 +69,22 @@ def run():
             rec['date_time_str'] = rec['date_time'].strftime('%-m/%-d/%y %-I:%M %p')
             rec['cycle_minutes'] = float((cycle_en - cycle_st)) / 1e9 / 60.0
             
-            rec['power'] = df_pwr.query(query_expr).power.mean()
+            # get dataframes for both the regular cycle and the extended cycle
+            df_pwr_cycle_ext = df_pwr.query(query_expr_ext)
+            df_pwr_cycle = df_pwr_cycle_ext.query(query_expr)    # faster to do this query on the shortened data set
+            df_cycle_ext = df.query(query_expr_ext)
+            df_cycle = df_cycle_ext.query(query_expr)
+            df_cycle_mean = df_cycle.mean()
 
-            df_cycle = df.query(query_expr).mean()
+            rec['power'] = df_pwr_cycle.power.mean()
+
             for fld in ('heat', 'flow', 'entering_t', 'leaving_t', 'out_t'):
-                rec[fld] = df_cycle[fld]
-            rec['cop'] = rec['heat'] / rec['power'] / 3.413
+                rec[fld] = df_cycle_mean[fld]
             rec['heat_dt'] = rec['leaving_t'] - rec['entering_t']
             rec['entering_out_dt'] = rec['entering_t'] - rec['out_t']
+            # Use extended cycle for the COP calculation
+            rec['cop'] = df_cycle_ext.heat.mean() / df_pwr_cycle_ext.power.mean() / 3.413
+
             recs.append(rec)
 
         dfr = pd.DataFrame(recs)
@@ -161,3 +175,6 @@ Cycle Length: %{customdata[7]:,.0f} minutes
 
     streamlit.markdown('## Raw Data')
     streamlit.write(dfr)
+
+if __name__ == '__main__':
+    run()
