@@ -143,13 +143,25 @@ HP Entering Temp: %{customdata[5]:.1f} F <br>
 HP Delta Temp: %{customdata[6]:.1f} F <br>
 Cycle Length: %{customdata[7]:,.0f} minutes
 """
+
+    # dropdown to select the variable to use for the color
+    color_vars = dict(
+        power='Compressor Power',
+        cycle_minutes='Cycle Length',
+        flow='Flow Rate'    
+    )
+    color_var = streamlit.selectbox(
+        'Select Variable to use for Dot Color',
+        list(color_vars.keys()), 
+        0, color_vars.get,
+    )
     fig = px.scatter(dfr, x='out_t', y='cop', 
-        color='power', size='size',
+        color=color_var, size='size',
         color_continuous_scale="Bluered_r")
     fig.update_layout(
         xaxis_title = 'Outdoor Temperature, deg F',
         yaxis_title = 'COP',
-        coloraxis_colorbar_title_text = 'Compressor Power'
+        coloraxis_colorbar_title_text = color_vars[color_var]
     )
     fig.update_traces(
         customdata=customdata,
@@ -160,12 +172,12 @@ Cycle Length: %{customdata[7]:,.0f} minutes
     streamlit.markdown('## COP vs. (Heat Pump Entering - Outdoor Temp)')
 
     fig = px.scatter(dfr, x='entering_out_dt', y='cop', 
-        color='power', size='size', 
+        color=color_var, size='size', 
         color_continuous_scale="Bluered_r")
     fig.update_layout(
         xaxis_title = 'Heat Pump Entering - Outdoor Temperature, deg F',
         yaxis_title = 'COP',
-        coloraxis_colorbar_title_text = 'Compressor Power'
+        coloraxis_colorbar_title_text = color_vars[color_var]
     )
     fig.update_traces(
         customdata=customdata,
