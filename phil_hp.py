@@ -8,7 +8,7 @@ from dateutil.parser import parse
 # A list of date ranges to exclude from the cycle analysis.  If the midpoint of the cycle
 # falls in any one of the following ranges, it is not included.
 DATES_TO_REMOVE = (
-    ('2020-09-07 11:00', '2020-09-07 16:30'),
+    ('2020-09-18 16:00', '2020-09-18 17:00'),
 )
 
 dfr = None
