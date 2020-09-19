@@ -49,11 +49,11 @@ def run():
         recs = []
         for cycle_st, cycle_en in cycles:
             # Create two query expressions, one that captures the cycle as defined by the
-            # electrical power cycle, but another "extended" cycle that adds 6 minutes to the 
+            # electrical power cycle, but another "extended" cycle that adds 5 minutes to the 
             # cycle to capture any residual heat that occurs at the end of the cycle.  Use
             # the extended cycle to calculate the COP.
             query_expr = '@cycle_st <= index < @cycle_en'
-            cycle_en_ext = cycle_en + np.timedelta64(6, 'm')       # extended cycle has end time 3 minutes later
+            cycle_en_ext = cycle_en + np.timedelta64(5, 'm')       # extended cycle has end time 3 minutes later
             query_expr_ext = '@cycle_st <= index < @cycle_en_ext'
 
             date_time = pd.to_datetime((cycle_en - cycle_st) / 2.0 + cycle_st)
