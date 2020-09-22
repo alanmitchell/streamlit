@@ -9,6 +9,9 @@ from dateutil.parser import parse
 # falls in any one of the following ranges, it is not included.
 DATES_TO_REMOVE = (
     ('2020-09-18 16:00', '2020-09-18 17:00'),
+    ('2020-09-20 07:00', '2020-09-20 23:59'),
+    ('2020-09-22 07:30', '2020-09-22 08:00'),
+    ('2020-09-22 11:00', '2020-09-22 11:30'),
 )
 
 dfr = None
