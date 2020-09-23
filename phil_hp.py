@@ -188,8 +188,8 @@ Cycle Length: %{customdata[7]:,.0f} minutes
     )
     streamlit.plotly_chart(fig, use_container_width=True)
 
-    streamlit.markdown('## Raw Data')
-    streamlit.write(dfr)
+    if streamlit.checkbox('Show Raw Data?'):
+        streamlit.write(dfr)
 
 if __name__ == '__main__':
     run()
