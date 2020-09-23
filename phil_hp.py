@@ -172,7 +172,9 @@ Cycle Length: %{customdata[7]:,.0f} minutes
     )
     streamlit.plotly_chart(fig, use_container_width=True)
 
-    streamlit.markdown('## COP vs. (Heat Pump Entering - Outdoor Temp)')
+    streamlit.markdown('''## COP vs. Temperature Lift
+Heat Pump Entering Temperature - Outdoor Temperature
+''')
 
     fig = px.scatter(dfr, x='entering_out_dt', y='cop', 
         color=color_var, size='size', 
