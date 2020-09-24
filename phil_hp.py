@@ -39,7 +39,7 @@ def run():
         df_pwr = server.sensor_readings([
                 ('phil_hp_pwr_16_pulse', 'power'),
             ], start_ts=start_ts)
-        df_pwr['on'] = df_pwr.power > 120.0
+        df_pwr['on'] = df_pwr.power > 130.0
         df_pwr['on_shift'] = df_pwr.on.shift()
         df_pwr['cycle_boundary'] = df_pwr.on != df_pwr.on_shift
         df_pwr.loc[df.index[0], 'cycle_boundary'] = False
