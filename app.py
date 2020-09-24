@@ -7,10 +7,14 @@ apps = {
     'phil-hp': "Phil's Heat Pump Data",
 }
 
-app = st.sidebar.radio('Select Application', list(apps.keys()), 0, apps.get)
+def main():
+    app = st.sidebar.radio('Select Application', list(apps.keys()), 0, apps.get)
 
-if app == 'pce':
-    pce_dashboard.run()
+    if app == 'pce':
+        pce_dashboard.run()
 
-elif app == 'phil-hp':
-    phil_hp.run()
+    elif app == 'phil-hp':
+        phil_hp.run()
+
+if __name__ == '__main__':
+    main()
