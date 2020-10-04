@@ -156,7 +156,7 @@ Age: %{customdata[10]:,.1f} days ago
     # checkbox to determine if dot size is varied
     vary_size = streamlit.checkbox('Mark Recent Cycles with Large Dots?', True)
     # Show zero on Y-Axis
-    show_zero = streamlit.checkbox('Show COP=0 on Vertical Axis?', False)
+    show_zero = streamlit.checkbox('Show COP=0 on Vertical Axis?', True)
 
     # dropdown to select the variable to use for the color
     color_vars = dict(
