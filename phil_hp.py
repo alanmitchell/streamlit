@@ -4,6 +4,7 @@ import numpy as np
 import plotly.express as px
 import bmondata
 from dateutil.parser import parse
+from datetime import datetime
 
 # A list of date ranges to exclude from the cycle analysis.  If the midpoint of the cycle
 # falls in any one of the following ranges, it is not included.
@@ -12,6 +13,7 @@ DATES_TO_REMOVE = (
     ('2020-09-20 07:00', '2020-09-20 23:59'),
     ('2020-09-22 07:30', '2020-09-22 08:00'),
     ('2020-09-22 11:00', '2020-09-22 11:30'),
+    ('2020-09-28 20:00', '2020-09-28 21:00'),
 )
 
 dfr = None
@@ -87,6 +89,7 @@ def run():
             rec['entering_out_dt'] = rec['entering_t'] - rec['out_t']
             # Use extended cycle for the COP calculation
             rec['cop'] = df_cycle_ext.heat.mean() / df_pwr_cycle_ext.power.mean() / 3.413
+            rec['age'] = (datetime.now() - date_time).total_seconds()/(3600.*24.)   # age of cycle in days
 
             recs.append(rec)
 
@@ -120,6 +123,7 @@ the cycle.  Larger dots are more recent cycles.
     cycle_minutes = dfr.cycle_minutes.values
     cop = dfr.cop.values
     power = dfr.power.values
+    age = dfr.age.values
 
     customdata = np.dstack((
         date_time_str,      # 0
@@ -132,6 +136,7 @@ the cycle.  Larger dots are more recent cycles.
         cycle_minutes,      # 7
         cop,                # 8
         power,              # 9
+        age,                # 10
     ))[0]
 
     # Template for the hover text:
@@ -144,28 +149,45 @@ Entering - Outside Temp: %{customdata[3]:.1f} F <br>
 Flow: %{customdata[4]:.1f} gpm <br>
 HP Entering Temp: %{customdata[5]:.1f} F <br>
 HP Delta Temp: %{customdata[6]:.1f} F <br>
-Cycle Length: %{customdata[7]:,.0f} minutes
+Cycle Length: %{customdata[7]:,.0f} minutes<br>
+Age: %{customdata[10]:,.1f} days ago
 """
+
+    # checkbox to determine if dot size is varied
+    vary_size = streamlit.checkbox('Mark Recent Cycles with Large Dots?', True)
+    # Show zero on Y-Axis
+    show_zero = streamlit.checkbox('Show COP=0 on Vertical Axis?', False)
 
     # dropdown to select the variable to use for the color
     color_vars = dict(
         power='Compressor Power',
         cycle_minutes='Cycle Length',
-        flow='Flow Rate'    
+        flow='Flow Rate',
+        age='Cycle Age (days ago)'
     )
     color_var = streamlit.selectbox(
         'Select Variable to use for Dot Color',
         list(color_vars.keys()), 
         0, color_vars.get,
     )
-    fig = px.scatter(dfr, x='out_t', y='cop', 
-        color=color_var, size='size',
-        color_continuous_scale="Bluered_r")
+    if vary_size:
+        fig = px.scatter(dfr, x='out_t', y='cop', 
+            color=color_var, size='size',
+            color_continuous_scale="Bluered_r")
+    else:
+        fig = px.scatter(dfr, x='out_t', y='cop', 
+            color=color_var,
+            color_continuous_scale="Bluered_r")
+
     fig.update_layout(
         xaxis_title = 'Outdoor Temperature, deg F',
         yaxis_title = 'COP',
         coloraxis_colorbar_title_text = color_vars[color_var]
     )
+
+    if show_zero:
+        fig.update_yaxes(rangemode="tozero")
+
     fig.update_traces(
         customdata=customdata,
         hovertemplate=hover_tmpl,
@@ -176,14 +198,24 @@ Cycle Length: %{customdata[7]:,.0f} minutes
 Heat Pump Entering Temperature - Outdoor Temperature
 ''')
 
-    fig = px.scatter(dfr, x='entering_out_dt', y='cop', 
-        color=color_var, size='size', 
-        color_continuous_scale="Bluered_r")
+    if vary_size:
+        fig = px.scatter(dfr, x='entering_out_dt', y='cop', 
+            color=color_var, size='size', 
+            color_continuous_scale="Bluered_r")
+    else:
+        fig = px.scatter(dfr, x='entering_out_dt', y='cop', 
+            color=color_var,
+            color_continuous_scale="Bluered_r")
+
     fig.update_layout(
         xaxis_title = 'Heat Pump Entering - Outdoor Temperature, deg F',
         yaxis_title = 'COP',
         coloraxis_colorbar_title_text = color_vars[color_var]
     )
+
+    if show_zero:
+        fig.update_yaxes(rangemode="tozero")
+
     fig.update_traces(
         customdata=customdata,
         hovertemplate=hover_tmpl,
