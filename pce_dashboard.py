@@ -3,6 +3,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from pathlib import Path
 
 def run():
     # Force app into a wider mode
@@ -21,7 +22,7 @@ def run():
     def get_pce_data():
         """Reads PCE data into dataframe and returns it.
         """
-        return pd.read_pickle('pce.pkl')
+        return pd.read_pickle(Path(__file__).parent / 'pce.pkl')
 
     df = get_pce_data()
 
