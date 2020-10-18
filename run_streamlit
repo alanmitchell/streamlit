@@ -1,6 +1,0 @@
-#!/bin/bash
-# This scripts starts and restarts, if necessary, the Streamlit app.
-until streamlit run app.py; do
-    echo "Streamlit crashed with exit code $?.  Respawning.." >&2
-    sleep 5
-done
