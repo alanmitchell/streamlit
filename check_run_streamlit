@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if ps ax | grep -v grep | grep /home/alan/streamlit > /dev/null
+if ps ax | grep -v grep | grep "/home/alan/streamlit/streamlit" > /dev/null
 then
     exit
 else
