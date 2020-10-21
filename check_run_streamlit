@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if ps ax | grep -v grep | grep "streamlit run" > /dev/null
+if ps ax | grep -v grep | grep "/home/alan/streamlit/venv/bin/streamlit run app.py" > /dev/null
 then
     exit
 else
