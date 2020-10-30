@@ -29,19 +29,35 @@ def gtw_map(x):
     else:
         return x if len(x) <= 10 else x[:4] + '..' + x[-4:]
 
+dev_lbls = dict(
+    A81758FFFE046262 = 'SEED Alcove',
+    A81758FFFE048DA1 = 'Tyler',
+    A81758FFFE0526D2 = '2nd Flr East',
+    A81758FFFE0526D3 = '1st Flr Risk',
+    A81758FFFE0526D4 =  '1st Flr Training',
+    A81758FFFE0526D5 = '4th Flr West',
+    A81758FFFE0526D6 = '3rd Flr Office',
+    A81758FFFE0526D7 = 'R2D2',
+    A84041000181C74E = 'Alan Freezer',
+    A84041000181C772 = 'Alan Outdoor Temp',
+    A84041C991822CA8 = 'Alan Greenhouse'
+)
+def dev_map(x):
+    return dev_lbls.get(x, x)
+
 def decode_post(post_data):
     d = json.loads(post_data)
     ts = parse(d['metadata']['time'])
     seconds_ago = (datetime.datetime.now(datetime.timezone.utc) - ts).total_seconds()
     gateways = [
         dict(
-            gateway = gtw['gtw_id'],
+            gateway = dev_map(gtw['gtw_id']),
             snr = gtw['snr'],
             rssi = gtw['rssi']
         ) for gtw in d['metadata']['gateways']
     ]
     return dict(
-        sensor = d['dev_id'],
+        sensor = dev_map(d['hardware_serial']),
         seconds_ago = seconds_ago,
         gateways = gateways
     )
@@ -67,7 +83,6 @@ def run():
                 snrs = [g['snr'] for g in info['gateways']]
                 df = pd.DataFrame(data = {'Gateway': gtws, 'SNR': snrs})
                 df['SNR above -15 dB'] = df.SNR + 15
-                df['Gateway'] = df.Gateway.map(gtw_map)
                 fig = px.bar(df, x='Gateway', y='SNR above -15 dB', width=800, height=600)
                 fig.update_yaxes(range=[0, 30])
                 fig.update_xaxes(
@@ -84,4 +99,5 @@ def run():
                 txt_seconds_ago.markdown('## No Data')
             time.sleep(2)
         txt_seconds_ago.empty()
+        txt_sensor.empty()
         cht.empty()
