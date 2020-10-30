@@ -51,7 +51,7 @@ def decode_post(post_data):
     seconds_ago = (datetime.datetime.now(datetime.timezone.utc) - ts).total_seconds()
     gateways = [
         dict(
-            gateway = dev_map(gtw['gtw_id']),
+            gateway = gtw_map(gtw['gtw_id']),
             snr = gtw['snr'],
             rssi = gtw['rssi']
         ) for gtw in d['metadata']['gateways']
