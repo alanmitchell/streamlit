@@ -80,9 +80,9 @@ def run():
                 gtws = [g['gateway'] for g in info['gateways']]
                 snrs = [g['snr'] for g in info['gateways']]
                 df = pd.DataFrame(data = {'Gateway': gtws, 'SNR': snrs})
-                df['SNR above -15 dB'] = df.SNR + 15
-                fig = px.bar(df, x='Gateway', y='SNR above -15 dB')  #, width=800, height=400)
-                fig.update_yaxes(range=[0, 25])
+                df['SNR above -10 dB'] = df.SNR + 10
+                fig = px.bar(df, x='Gateway', y='SNR above -10 dB')  
+                fig.update_yaxes(range=[0, 20])
                 fig.update_xaxes(
                     tickangle = 30,
                     title_font = {'size': 15},
