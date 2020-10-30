@@ -69,7 +69,6 @@ def run():
     rcv_time = streamlit.slider('Minutes to Receive Data', min_value=0.1, max_value=15.0, value=1.0, step=0.1)
     st = time.time()
     start_button = streamlit.button('Start Receiving')
-    txt_sensor = streamlit.empty()
     txt_seconds_ago = streamlit.empty()
     cht = streamlit.empty()
     if start_button:
@@ -77,27 +76,25 @@ def run():
             if Path(last_post_path).exists():
                 last_post = open(last_post_path).read()
                 info = decode_post(last_post)
-                txt_seconds_ago.markdown(f'## {info["seconds_ago"]:,.0f} seconds ago')
-                txt_sensor.markdown(f'### Sensor: {info["sensor"]}')
+                txt_seconds_ago.markdown(f'## {info["seconds_ago"]:,.0f} seconds ago, {info["sensor"]}')
                 gtws = [g['gateway'] for g in info['gateways']]
                 snrs = [g['snr'] for g in info['gateways']]
                 df = pd.DataFrame(data = {'Gateway': gtws, 'SNR': snrs})
                 df['SNR above -15 dB'] = df.SNR + 15
-                fig = px.bar(df, x='Gateway', y='SNR above -15 dB', width=800, height=600)
-                fig.update_yaxes(range=[0, 30])
+                fig = px.bar(df, x='Gateway', y='SNR above -15 dB')  #, width=800, height=400)
+                fig.update_yaxes(range=[0, 25])
                 fig.update_xaxes(
-                    tickangle = 45,
-                    title_font = {'size': 16},
-                    tickfont = {'size': 18},
+                    tickangle = 30,
+                    title_font = {'size': 15},
+                    tickfont = {'size': 15},
                 )
                 fig.update_layout(
 
                 )
-                cht.plotly_chart(fig)
+                cht.plotly_chart(fig, use_container_width=True)
 
             else:
                 txt_seconds_ago.markdown('## No Data')
             time.sleep(2)
         txt_seconds_ago.empty()
-        txt_sensor.empty()
         cht.empty()
