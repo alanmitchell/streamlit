@@ -1,10 +1,12 @@
 import streamlit as st
 import pce_dashboard
 import phil_hp
+import lora_sig
 
 apps = {
     'pce': 'Power Cost Equalization (PCE) Data',
     'phil-hp': "Phil's Heat Pump Data",
+    'lora-sig': 'LoRa Signal Strength'
 }
 
 def main():
@@ -15,6 +17,9 @@ def main():
 
     elif app == 'phil-hp':
         phil_hp.run()
+
+    elif app == 'lora-sig':
+        lora_sig.run()
 
 if __name__ == '__main__':
     main()
