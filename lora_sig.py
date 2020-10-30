@@ -76,7 +76,7 @@ def run():
             if Path(last_post_path).exists():
                 last_post = open(last_post_path).read()
                 info = decode_post(last_post)
-                txt_seconds_ago.markdown(f'## {info["seconds_ago"]:,.0f} seconds ago, {info["sensor"]}')
+                txt_seconds_ago.markdown(f'### {info["seconds_ago"]:,.0f} secs ago, {info["sensor"]}')
                 gtws = [g['gateway'] for g in info['gateways']]
                 snrs = [g['snr'] for g in info['gateways']]
                 df = pd.DataFrame(data = {'Gateway': gtws, 'SNR': snrs})
