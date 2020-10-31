@@ -81,7 +81,7 @@ def run():
                 snrs = [g['snr'] for g in info['gateways']]
                 df = pd.DataFrame(data = {'Gateway': gtws, 'SNR': snrs})
                 df['SNR above -10 dB'] = df.SNR + 10
-                df.sort_values('gateway', inplace=True)
+                df.sort_values('Gateway', inplace=True) 
                 fig = px.bar(df, x='Gateway', y='SNR above -10 dB')  
                 fig.update_yaxes(range=[0, 20])
                 fig.update_xaxes(
