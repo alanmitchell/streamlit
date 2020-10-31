@@ -40,7 +40,8 @@ dev_lbls = dict(
     A81758FFFE0526D7 = 'R2D2',
     A84041000181C74E = 'Alan Freezer',
     A84041000181C772 = 'Alan Outdoor Temp',
-    A84041C991822CA8 = 'Alan Greenhouse'
+    A84041C991822CA8 = 'Alan Greenhouse',
+    A81758FFFE0523DB = 'ELT #1 23DB'
 )
 def dev_map(x):
     return dev_lbls.get(x, x)
@@ -58,6 +59,7 @@ def decode_post(post_data):
     ]
     return dict(
         sensor = dev_map(d['hardware_serial']),
+        ts = ts,
         seconds_ago = seconds_ago,
         gateways = gateways
     )
@@ -72,30 +74,33 @@ def run():
     txt_seconds_ago = streamlit.empty()
     cht = streamlit.empty()
     if start_button:
+        last_ts = None
         while (time.time() - st)/60.0 < rcv_time:
             if Path(last_post_path).exists():
                 last_post = open(last_post_path).read()
                 info = decode_post(last_post)
                 txt_seconds_ago.markdown(f'### {info["seconds_ago"]:,.0f} secs ago, {info["sensor"]}')
-                gtws = [g['gateway'] for g in info['gateways']]
-                snrs = [g['snr'] for g in info['gateways']]
-                df = pd.DataFrame(data = {'Gateway': gtws, 'SNR': snrs})
-                df['SNR above -10 dB'] = df.SNR + 10
-                df.sort_values('Gateway', inplace=True) 
-                fig = px.bar(df, x='Gateway', y='SNR above -10 dB')  
-                fig.update_yaxes(range=[0, 20])
-                fig.update_xaxes(
-                    tickangle = 30,
-                    title_font = {'size': 15},
-                    tickfont = {'size': 15},
-                )
-                fig.update_layout(
+                if info['ts'] != last_ts:
+                    last_ts = info['ts']
+                    gtws = [g['gateway'] for g in info['gateways']]
+                    snrs = [g['snr'] for g in info['gateways']]
+                    df = pd.DataFrame(data = {'Gateway': gtws, 'SNR': snrs})
+                    df['SNR above -10 dB'] = df.SNR + 10
+                    df.sort_values('Gateway', inplace=True) 
+                    fig = px.bar(df, x='Gateway', y='SNR above -10 dB')  
+                    fig.update_yaxes(range=[0, 20])
+                    fig.update_xaxes(
+                        tickangle = 30,
+                        title_font = {'size': 15},
+                        tickfont = {'size': 15},
+                    )
+                    fig.update_layout(
 
-                )
-                cht.plotly_chart(fig, use_container_width=True)
+                    )
+                    cht.plotly_chart(fig, use_container_width=True)
 
             else:
                 txt_seconds_ago.markdown('## No Data')
-            time.sleep(2)
+            time.sleep(1)
         txt_seconds_ago.empty()
         cht.empty()
