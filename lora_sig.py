@@ -59,6 +59,7 @@ def decode_post(post_data):
     ]
     return dict(
         sensor = dev_map(d['hardware_serial']),
+        data_rate = d['metadata']['data_rate'],
         ts = ts,
         seconds_ago = seconds_ago,
         gateways = gateways
@@ -79,7 +80,7 @@ def run():
             if Path(last_post_path).exists():
                 last_post = open(last_post_path).read()
                 info = decode_post(last_post)
-                txt_seconds_ago.markdown(f'### {info["seconds_ago"]:,.0f} secs ago, {info["sensor"]}')
+                txt_seconds_ago.markdown(f'### {info["seconds_ago"]:,.0f} secs ago, {info["sensor"]}, {info["data_rate"]}')
                 if info['ts'] != last_ts:
                     last_ts = info['ts']
                     gtws = [g['gateway'] for g in info['gateways']]
