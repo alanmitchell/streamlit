@@ -44,7 +44,11 @@ def run():
         df_pwr['on'] = df_pwr.power > 130.0
         df_pwr['on_shift'] = df_pwr.on.shift()
         df_pwr['cycle_boundary'] = df_pwr.on != df_pwr.on_shift
-        df_pwr.loc[df.index[0], 'cycle_boundary'] = False
+        # set first value to false
+        vals = df_pwr['cycle_boundary'].values
+        vals[0] =  False
+        df_pwr['cycle_boundary'] = vals
+        # df_pwr.loc[df.index[0], 'cycle_boundary'] = False   # did not work due to duplicate index DST
 
         df_bound = df_pwr.query('cycle_boundary == True')
         st = 0 if df_bound.on[0] == True else 1
