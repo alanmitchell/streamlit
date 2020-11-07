@@ -107,7 +107,7 @@ def run():
                     )
                     cht.plotly_chart(fig, use_container_width=True)
 
-                    cmd = f'tail -n {reading_history_n} ' + str(lora_all)
+                    cmd = f'/usr/bin/tail -n {reading_history_n} ' + str(lora_all)
                     output = subprocess.check_output(cmd, shell=True)
                     results = []
                     for lin in output.splitlines():
