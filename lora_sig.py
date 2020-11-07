@@ -71,10 +71,10 @@ def run():
 
     streamlit.markdown("# LoRa Signal Strength Data")
 
-    rcv_time = streamlit.slider('Minutes to Receive Data', min_value=0.1, max_value=15.0, value=1.0, step=0.1)
-    reading_history_n = streamlit.slider('Number of Readings to Plot in History Chart', 10, 100, 40)
+    rcv_time = streamlit.sidebar.slider('Minutes to Receive Data', min_value=0.1, max_value=15.0, value=1.0, step=0.1)
+    reading_history_n = streamlit.sidebar.slider('Number of Readings to Plot in History Chart', 10, 100, 40)
     st = time.time()
-    start_button = streamlit.button('Start Receiving')
+    start_button = streamlit.sidebar.button('Start Receiving')
     txt_seconds_ago = streamlit.empty()
     cht = streamlit.empty()
     cht_history = streamlit.empty()
