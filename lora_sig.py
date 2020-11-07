@@ -2,12 +2,14 @@ import time
 import json
 import datetime
 from pathlib import Path
+import subprocess
 from dateutil.parser import parse
+from dateutil import tz
 import streamlit
 import pandas as pd
 import plotly.express as px
 
-last_post_path = '../an-api/lora-data/lora-last.txt'
+lora_data_path = '../an-api/lora-data'
 
 gtw_lbls = {
     'eui-00800000a00034ed': 'Kasilof',
@@ -70,15 +72,20 @@ def run():
     streamlit.markdown("# LoRa Signal Strength Data")
 
     rcv_time = streamlit.slider('Minutes to Receive Data', min_value=0.1, max_value=15.0, value=1.0, step=0.1)
+    reading_history_n = streamlit.slider('Number of Readings to Plot in History Chart', 10, 100, 40)
     st = time.time()
     start_button = streamlit.button('Start Receiving')
     txt_seconds_ago = streamlit.empty()
     cht = streamlit.empty()
+    cht_history = streamlit.empty()
+    tz_display = tz.gettz('US/Alaska')
     if start_button:
         last_ts = None
+        lora_last = Path(lora_data_path) / Path('lora-last.txt')
+        lora_all = Path(lora_data_path) / Path('lora.txt')
         while (time.time() - st)/60.0 < rcv_time:
-            if Path(last_post_path).exists():
-                last_post = open(last_post_path).read()
+            if lora_last.exists():
+                last_post = open(lora_last).read()
                 info = decode_post(last_post)
                 txt_seconds_ago.markdown(f'### {info["seconds_ago"]:,.0f} secs ago, {info["sensor"]}, {info["data_rate"]}')
                 if info['ts'] != last_ts:
@@ -100,8 +107,23 @@ def run():
                     )
                     cht.plotly_chart(fig, use_container_width=True)
 
+                    cmd = f'tail -n {reading_history_n} ' + str(lora_all)
+                    output = subprocess.check_output(cmd, shell=True)
+                    results = []
+                    for lin in output.splitlines():
+                        data = decode_post(lin)
+                        for gtw in data['gateways']:
+                            rec = {'time': data['ts'].astimezone(tz_display).replace(tzinfo=None), 'gateway': gtw['gateway'], 'SNR': gtw['snr']}
+                            results.append(rec)
+                    df_history = pd.DataFrame(results)
+                    fig = px.scatter(df_history, x='time', y='SNR', color='gateway')  
+                    cht_history.plotly_chart(fig, use_container_width=True)
+
             else:
                 txt_seconds_ago.markdown('## No Data')
+
             time.sleep(1)
+
         txt_seconds_ago.empty()
         cht.empty()
+        cht_history.empty()
