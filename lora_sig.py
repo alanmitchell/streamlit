@@ -128,7 +128,8 @@ def run():
                         )
                         recs.append(rec)
                 df_history = pd.DataFrame(recs)
-                fig = px.scatter(df_history, x='Time', y='SNR', color='Gateway')  
+                fig = px.scatter(df_history, x='Time', y='SNR', color='Gateway')
+                fig.update_yaxes(range=[-14, 14])
                 cht_history.plotly_chart(fig, use_container_width=True)
 
             time.sleep(1)
