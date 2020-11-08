@@ -17,7 +17,7 @@ gtw_lbls = {
     'eui-3235313227006100': 'Abbot/Elmore',
     'eui-323531322b004500': 'Intl/C St',
     'eui-58a0cbfffe800baf': 'SEED Lab',
-    'eui-58a0cbfffe8015fd': 'Tyler',
+    'eui-58a0cbfffe8015fd': 'Tyler Indoor',
     'eui-a840411d91b44150': 'Dragino LPS8',
     'eui-c0ee40ffff293d87': 'Laird',
     'kl4qh-mtcdt3': 'ANMC',
