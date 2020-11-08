@@ -5,11 +5,12 @@ from pathlib import Path
 import subprocess
 from dateutil.parser import parse
 from dateutil import tz
-import streamlit
+import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-lora_data_path = '../an-api/lora-data'
+lora_data_file = '../an-api/lora-data/lora.txt'
+reading_count_to_read = 500
 
 gtw_lbls = {
     'eui-00800000a00034ed': 'Kasilof',
@@ -25,33 +26,25 @@ gtw_lbls = {
     'eui-a84041ffff1ee2b4': 'Dragino Outdoor',
 }
 
+dev_lbls = dict(
+    A81758FFFE0523DB = 'ELT #1 23DB',
+)
+
 def gtw_map(x):
     if x in gtw_lbls:
         return gtw_lbls[x]
     else:
         return x if len(x) <= 10 else x[:4] + '..' + x[-4:]
 
-dev_lbls = dict(
-    A81758FFFE046262 = 'SEED Alcove',
-    A81758FFFE048DA1 = 'Tyler',
-    A81758FFFE0526D2 = '2nd Flr East',
-    A81758FFFE0526D3 = '1st Flr Risk',
-    A81758FFFE0526D4 =  '1st Flr Training',
-    A81758FFFE0526D5 = '4th Flr West',
-    A81758FFFE0526D6 = '3rd Flr Office',
-    A81758FFFE0526D7 = 'R2D2',
-    A84041000181C74E = 'Alan Freezer',
-    A84041000181C772 = 'Alan Outdoor Temp',
-    A84041C991822CA8 = 'Alan Greenhouse',
-    A81758FFFE0523DB = 'ELT #1 23DB'
-)
 def dev_map(x):
     return dev_lbls.get(x, x)
 
+tz_display = tz.gettz('US/Alaska')
 def decode_post(post_data):
     d = json.loads(post_data)
     ts = parse(d['metadata']['time'])
     seconds_ago = (datetime.datetime.now(datetime.timezone.utc) - ts).total_seconds()
+    ts = ts.astimezone(tz_display).replace(tzinfo=None)
     gateways = [
         dict(
             gateway = gtw_map(gtw['gtw_id']),
@@ -67,60 +60,72 @@ def decode_post(post_data):
         gateways = gateways
     )
 
+def get_readings(reading_ct=reading_count_to_read, data_file=lora_data_file):
+    """Returns a DataFrame of the last 'reading_ct' readings received.
+    Readings are read from the file with a full path of 'data_file'.
+    """
+    cmd = f'/usr/bin/tail -n {reading_ct} ' + data_file
+    output = subprocess.check_output(cmd, shell=True)
+    results = []
+    for lin in output.splitlines():
+        data = decode_post(lin)
+        results.append(data)
+        #for gtw in data['gateways']:
+        #    rec = {'time': data['ts'], 'gateway': gtw['gateway'], 'SNR': gtw['snr']}
+        #    results.append(rec)
+    return pd.DataFrame(results)
+
 def run():
 
-    streamlit.markdown("# LoRa Signal Strength Data")
+    st.markdown("# LoRa Signal Strength Data")
 
-    rcv_time = streamlit.sidebar.slider('Minutes to Receive Data', min_value=0.1, max_value=15.0, value=1.0, step=0.1)
-    reading_history_n = streamlit.sidebar.slider('Number of Readings to Plot in History Chart', 10, 100, 40)
-    st = time.time()
-    start_button = streamlit.sidebar.button('Start Receiving')
-    txt_seconds_ago = streamlit.empty()
-    cht = streamlit.empty()
-    cht_history = streamlit.empty()
-    tz_display = tz.gettz('US/Alaska')
+    sensor = st.sidebar.selectbox('Select Sensor to View', list(dev_lbls.values()))
+    rcv_time = st.sidebar.slider('Minutes to Receive Data', min_value=0.1, max_value=15.0, value=1.0, step=0.1)
+    reading_history_n = st.sidebar.slider('Number of Readings to Plot in History Chart', 10, 100, 40)
+    start_button = st.sidebar.button('Start Receiving')
+    txt_seconds_ago = st.empty()
+    cht = st.empty()
+    cht_history = st.empty()
+    start = time.time()
     if start_button:
-        last_ts = None
-        lora_last = Path(lora_data_path) / Path('lora-last.txt')
-        lora_all = Path(lora_data_path) / Path('lora.txt')
-        while (time.time() - st)/60.0 < rcv_time:
-            if lora_last.exists():
-                last_post = open(lora_last).read()
-                info = decode_post(last_post)
-                txt_seconds_ago.markdown(f'### {info["seconds_ago"]:,.0f} secs ago, {info["sensor"]}, {info["data_rate"]}')
-                if info['ts'] != last_ts:
-                    last_ts = info['ts']
-                    gtws = [g['gateway'] for g in info['gateways']]
-                    snrs = [g['snr'] for g in info['gateways']]
-                    df = pd.DataFrame(data = {'Gateway': gtws, 'SNR': snrs})
-                    df['SNR above -10 dB'] = df.SNR + 10
-                    df.sort_values('Gateway', inplace=True) 
-                    fig = px.bar(df, x='Gateway', y='SNR above -10 dB')  
-                    fig.update_yaxes(range=[0, 20])
-                    fig.update_xaxes(
-                        tickangle = 30,
-                        title_font = {'size': 15},
-                        tickfont = {'size': 15},
-                    )
-                    fig.update_layout(
+        file_mod_time = None
+        while (time.time() - start)/60.0 < rcv_time:
+            cur_file_mod_time = Path(lora_data_file).stat().st_mtime
+            if file_mod_time != cur_file_mod_time:
+                file_mod_time = cur_file_mod_time
+                df = get_readings()
+                df_sensor = df.query('sensor == @sensor')
+                info = df_sensor.iloc[-1].to_dict()     # get last reading
+                txt_seconds_ago.markdown(f'### {info["seconds_ago"]:,.0f} secs ago, {info["data_rate"]}')
+                gtws = [g['gateway'] for g in info['gateways']]
+                snrs = [g['snr'] for g in info['gateways']]
+                df_gtw = pd.DataFrame(data = {'Gateway': gtws, 'SNR': snrs})
+                df_gtw['SNR above -10 dB'] = df_gtw.SNR + 10
+                df_gtw.sort_values('Gateway', inplace=True) 
+                fig = px.bar(df_gtw, x='Gateway', y='SNR above -10 dB')  
+                fig.update_yaxes(range=[0, 20])
+                fig.update_xaxes(
+                    tickangle = 30,
+                    title_font = {'size': 15},
+                    tickfont = {'size': 15},
+                )
+                cht.plotly_chart(fig, use_container_width=True)
 
-                    )
-                    cht.plotly_chart(fig, use_container_width=True)
-
-                    cmd = f'/usr/bin/tail -n {reading_history_n} ' + str(lora_all)
-                    output = subprocess.check_output(cmd, shell=True)
-                    results = []
-                    for lin in output.splitlines():
-                        data = decode_post(lin)
-                        for gtw in data['gateways']:
-                            rec = {'time': data['ts'].astimezone(tz_display).replace(tzinfo=None), 'gateway': gtw['gateway'], 'SNR': gtw['snr']}
-                            results.append(rec)
-                    df_history = pd.DataFrame(results)
-                    fig = px.scatter(df_history, x='time', y='SNR', color='gateway')  
-                    cht_history.plotly_chart(fig, use_container_width=True)
-
-            else:
-                txt_seconds_ago.markdown('## No Data')
+                # make a history data frame with a row for each gateway reception.
+                # Plot a scatter plot of the results.
+                recs = []
+                for _, r in df_sensor.tail(reading_history_n).iterrows():
+                    ts = r.ts
+                    for gtw in r.gateways:
+                        rec = dict(
+                            Time = ts,
+                            Gateway = gtw['gateway'],
+                            SNR = gtw['snr']
+                        )
+                        recs.append(rec)
+                df_history = pd.DataFrame(recs)
+                fig = px.scatter(df_history, x='Time', y='SNR', color='Gateway')  
+                cht_history.plotly_chart(fig, use_container_width=True)
 
             time.sleep(1)
 
