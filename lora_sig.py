@@ -42,9 +42,8 @@ def dev_map(x):
 tz_display = tz.gettz('US/Alaska')
 def decode_post(post_data):
     d = json.loads(post_data)
-    ts = parse(d['metadata']['time'])
-    seconds_ago = (datetime.datetime.now(datetime.timezone.utc) - ts).total_seconds()
-    ts = ts.astimezone(tz_display).replace(tzinfo=None)
+    ts_utc = parse(d['metadata']['time'])
+    ts = ts_utc.astimezone(tz_display).replace(tzinfo=None)
     gateways = [
         dict(
             gateway = gtw_map(gtw['gtw_id']),
@@ -56,7 +55,7 @@ def decode_post(post_data):
         sensor = dev_map(d['hardware_serial']),
         data_rate = d['metadata']['data_rate'],
         ts = ts,
-        seconds_ago = seconds_ago,
+        ts_utc = ts_utc,
         gateways = gateways
     )
 
@@ -70,9 +69,6 @@ def get_readings(reading_ct=reading_count_to_read, data_file=lora_data_file):
     for lin in output.splitlines():
         data = decode_post(lin)
         results.append(data)
-        #for gtw in data['gateways']:
-        #    rec = {'time': data['ts'], 'gateway': gtw['gateway'], 'SNR': gtw['snr']}
-        #    results.append(rec)
     return pd.DataFrame(results)
 
 def run():
@@ -89,14 +85,22 @@ def run():
     start = time.time()
     if start_button:
         file_mod_time = None
+        last_ts = None
+        last_datarate = None
         while (time.time() - start)/60.0 < rcv_time:
+            if last_ts:
+                seconds_ago = time.time() - last_ts
+                txt_seconds_ago.markdown(f'### {seconds_ago:,.0f} secs ago, {last_datarate}')
             cur_file_mod_time = Path(lora_data_file).stat().st_mtime
             if file_mod_time != cur_file_mod_time:
                 file_mod_time = cur_file_mod_time
                 df = get_readings()
                 df_sensor = df.query('sensor == @sensor')
                 info = df_sensor.iloc[-1].to_dict()     # get last reading
-                txt_seconds_ago.markdown(f'### {info["seconds_ago"]:,.0f} secs ago, {info["data_rate"]}')
+                last_ts = info['ts_utc'].timestamp()
+                last_datarate = info['data_rate']
+                seconds_ago = time.time() - last_ts
+                txt_seconds_ago.markdown(f'### {seconds_ago:,.0f} secs ago, {last_datarate}')
                 gtws = [g['gateway'] for g in info['gateways']]
                 snrs = [g['snr'] for g in info['gateways']]
                 df_gtw = pd.DataFrame(data = {'Gateway': gtws, 'SNR': snrs})
