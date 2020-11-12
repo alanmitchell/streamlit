@@ -28,7 +28,8 @@ gtw_lbls = {
 
 dev_lbls = dict(
     A81758FFFE0523DB = 'ELT #1 23DB',
-    A8404173E1822CA4 = 'LHT65 2CA4'
+    A8404173E1822CA4 = 'LHT65 2CA4',
+    A81758FFFE04259E = 'ERS 259E',
 )
 
 def gtw_map(x):
