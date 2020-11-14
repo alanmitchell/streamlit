@@ -24,6 +24,8 @@ gtw_lbls = {
     'eui-24e124fffef06f56': 'Old Swd/Tudor',
     'eui-000080029c2b2b77': 'Bear Valley',
     'eui-a84041ffff1ee2b4': 'Dragino Outdoor',
+    'eui-a840411eed744150': 'Phil Home',
+    'eui-58a0cbfffe802c68': 'Things Indoor #2'
 }
 
 dev_lbls = dict(
