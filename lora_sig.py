@@ -10,7 +10,7 @@ import pandas as pd
 import plotly.express as px
 
 lora_data_file = '../an-api/lora-data/lora.txt'
-reading_count_to_read = 500
+reading_count_to_read = 4000
 
 gtw_lbls = {
     'eui-00800000a00034ed': 'Kasilof',
