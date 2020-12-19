@@ -25,7 +25,7 @@ gtw_lbls = {
     'eui-000080029c2b2b77': 'Bear Valley',
     'eui-a84041ffff1ee2b4': 'Dragino Outdoor',
     'eui-a840411eed744150': 'Phil Home',
-    'eui-58a0cbfffe802c68': "Phil's TIG #1"
+    'eui-58a0cbfffe802c68': "Altermatt TIG"
 }
 
 dev_lbls = dict(
