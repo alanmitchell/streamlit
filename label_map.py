@@ -4,6 +4,7 @@
 # Maps Device EUI to a Label
 dev_lbls = dict(
     A81758FFFE0523DB = 'Tyler ELT-Lite 23DB',
+    A81758FFFE05368E = '122 N Bliss',
     A8404173E1822CA4 = 'Alan LHT65 2CA4',
     A81758FFFE04259E = 'Alan ERS 259E',
     A8404137B182428E = 'Phil LT22222 428E',
@@ -26,6 +27,10 @@ dev_id_lbls = {
     'lht65-a8404175d1822ca7': 'Peter LHT65 2CA7',
     'boat-lt2-a840417f8182436e': 'Phil LT22222 436E',
     'boat-lt2-a84041599182436c': 'Phil LT22222 436C',
+    'erslite-a81758fffe05569d': '3148 E 19th, Anc',
+    'erslite-a81758fffe05569f': '3414 E 16th, Anc',
+    'erslite-a81758fffe0556a0': '3424 E 18th, Anc',
+    'elt2-a81758fffe05368e': '122 N Bliss',
 }
 
 # Maps Gateway IDs to a Label
@@ -35,7 +40,7 @@ gtw_lbls = {
     'eui-323531322b004500': 'Intl/C St',
     'eui-58a0cbfffe800baf': 'SEED Lab',
     'eui-58a0cbfffe8015fd': 'Tyler Indoor',
-    'eui-a840411d91b44150': 'Dragino LPS8',
+    'eui-a840411d91b44150': 'Alan Outdoor',
     'eui-c0ee40ffff293d87': 'Laird',
     'kl4qh-mtcdt3': 'ANMC',
     'eui-24e124fffef06f56': 'Old Swd/Tudor',
