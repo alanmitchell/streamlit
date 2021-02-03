@@ -51,8 +51,11 @@ def get_readings(reading_ct=reading_count_to_read, data_file=lora_data_file):
     output = subprocess.check_output(cmd, shell=True)
     results = []
     for lin in output.splitlines():
-        data = decode_post(lin)
-        results.append(data)
+        try:
+            data = decode_post(lin)
+            results.append(data)
+        except:
+            pass
     return pd.DataFrame(results)
 
 def run():
