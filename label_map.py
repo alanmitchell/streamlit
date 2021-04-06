@@ -5,6 +5,15 @@
 dev_lbls = dict(
     A81758FFFE0523DB = 'Tyler ELT-Lite 23DB',
     A81758FFFE05368E = '122 N Bliss',
+    A81758FFFE05368F = '122 N Bliss Unit',
+    A81758FFFE05569F = '3414 E 16th',
+    A81758FFFE0556A0 = '3424 E 18th',
+    A81758FFFE05569D = '3148 E. 19th',
+    A81758FFFE05569E = '1826 Columbine',
+    A81758FFFE0536AB = '3136 E 17th',
+    A81758FFFE053690 = 'PH 3690',
+    A81758FFFE05661C = 'PH 661C',
+    A81758FFFE05661D = 'Alan ELTLite 661D',
     A8404173E1822CA4 = 'Alan LHT65 2CA4',
     A81758FFFE04259E = 'Alan ERS 259E',
     A8404137B182428E = 'Phil LT22222 428E',
@@ -31,6 +40,7 @@ dev_id_lbls = {
     'erslite-a81758fffe05569f': '3414 E 16th, Anc',
     'erslite-a81758fffe0556a0': '3424 E 18th, Anc',
     'elt2-a81758fffe05368e': '122 N Bliss',
+    'elt2-a81758fffe05368f': '122 N Bliss Unit',
 }
 
 # Maps Gateway IDs to a Label
@@ -49,4 +59,6 @@ gtw_lbls = {
     'eui-a840411eed744150': 'Phil Home',
     'eui-58a0cbfffe802c68': "Altermatt TIG",
     'eui-58a0cbfffe80326e': 'Phil TIG',
+    'eui-a84041ffff1eb500': 'AHFC HQ Outdoor',
+    'eui-a840411eb4084150': 'Alan LIG16 #2',
 }
