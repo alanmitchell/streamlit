@@ -39,6 +39,7 @@ dev_id_lbls = {
     'erslite-a81758fffe05569d': '3148 E 19th, Anc',
     'erslite-a81758fffe05569f': '3414 E 16th, Anc',
     'erslite-a81758fffe0556a0': '3424 E 18th, Anc',
+    'erslite-a81758fffe05569e': '1826 Columbine, Anc',
     'elt2-a81758fffe05368e': '122 N Bliss',
     'elt2-a81758fffe05368f': '122 N Bliss Unit',
 }
