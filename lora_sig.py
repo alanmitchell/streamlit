@@ -134,7 +134,7 @@ def run():
                 cht.empty()
                 cht_history.empty()
 
-            time.sleep(1)
+            time.sleep(2)
 
         txt_seconds_ago.empty()
         cht.empty()
