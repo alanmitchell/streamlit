@@ -75,7 +75,6 @@ def run():
 
     sensor = st.sidebar.selectbox('Select Sensor to View', list(dev_id_lbls.values()))
     rcv_time = st.sidebar.slider('Minutes to Receive Data', min_value=0.1, max_value=15.0, value=1.0, step=0.1)
-    reading_history_n = st.sidebar.slider('Number of Readings to Plot in History Chart', 10, 100, 40)
     start_button = st.sidebar.button('Start Receiving')
     txt_seconds_ago = st.empty()
     cht = st.empty()
