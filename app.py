@@ -4,9 +4,9 @@ import phil_hp
 import lora_sig
 
 apps = {
+    'lora-sig': 'LoRa Signal Strength',
     'pce': 'Power Cost Equalization (PCE) Data',
     'phil-hp': "Phil's Heat Pump Data",
-    'lora-sig': 'LoRa Signal Strength'
 }
 
 def main():
