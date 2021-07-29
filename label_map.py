@@ -26,7 +26,7 @@ dev_lbls = dict(
 
 # Maps Device ID to Label
 dev_id_lbls = {
-    'elt-a81758fffe0523db': 'Tyler ELT-Lite 23DB',
+    'elt-a81758fffe0523db': 'Tyler ELT-Lite Stick 23DB',
     'boat-lt2-a840417f8182436e': 'Phil Boat 436E',
     'eltlite-scott-6632': 'Scott Water Well 6632',
     'boat-lt2-a8404137b182428e': 'Phil LT22222 428E',
