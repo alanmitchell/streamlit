@@ -24,11 +24,11 @@ def trim_file(fn_in, fn_out, days_to_keep):
         st_date = datetime.now() - timedelta(days=days_to_keep)
         st_str = st_date.strftime('%Y-%m-%d')
 
-        res = co(f'grep -n {st_str} {fn_in} | head -n1')
+        res = co(f'/usr/bin/grep -n {st_str} {fn_in} | /usr/bin/head -n1')
         st_line = res.split(':')[0]
 
-        co(f'head -n1 {fn_in} > {temp_p}')            # put header row in output file
-        co(f'tail -n +{st_line} {fn_in} >> {temp_p}')
+        co(f'/usr/bin/head -n1 {fn_in} > {temp_p}')            # put header row in output file
+        co(f'/usr/bin/tail -n +{st_line} {fn_in} >> {temp_p}')
         shutil.copy(str(temp_p), str(fn_out))  # str() in case Python <=3.7
 
 if __name__ == '__main__':
