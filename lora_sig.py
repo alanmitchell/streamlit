@@ -13,9 +13,9 @@ import pandas as pd
 import plotly.express as px
 
 from label_map import dev_id_lbls, gtw_lbls
+from trim_files import trim_file
 
 lora_data_file = '../an-api/lora-data/gateways.tsv'
-lines_to_read = 10000
 
 def gtw_map(x):
     if x in gtw_lbls:
@@ -29,22 +29,18 @@ def dev_map(x):
 # timezone of the 'ts' column in the data is Alaska
 tz_data = pytz.timezone('US/Alaska')
 
-def get_readings(sensor, line_ct=lines_to_read, data_file=lora_data_file):
-    """Returns a DataFrame of the readings for the sensor (a sensor label) in the last 'line_ct' 
-    lines in the LoRa gateway file. Readings are read from the file with a full path 
+def get_readings(sensor, data_file=lora_data_file):
+    """Returns a DataFrame of the readings for the sensor (a sensor label) starting at the
+    beginning of yesterday. Readings are read from the file with a full path 
     of 'data_file'.  Only the Gateway, SNR, data_rate, counter and the ts (timestamp) columns are retained, 
     and the timestamp column is converted to a DateTime column.  Gateway labels are used
     if available for a particular Gateway ID.
     """
-    # get the header row
-    cmd = f'/usr/bin/head -n 1 ' + data_file
-    hdr =  subprocess.check_output(cmd, shell=True)
-    
-    # get the data rows requested
-    cmd = f'/usr/bin/tail -n {line_ct} ' + data_file
-    output = subprocess.check_output(cmd, shell=True)
-    
-    df = pd.read_csv(io.BytesIO(hdr + output), sep='\t')
+    # create a file in this directory with rows starting the beginning of yesterday
+    trim_file(data_file, './gtw.tsv', 1)
+
+    # read it into a DataFrame    
+    df = pd.read_csv('./gtw.tsv', sep='\t')
 
     # Filter to desired sensor and desired columns
     # First need to convert the sensor label into a Dev ID.  Need to reverse
