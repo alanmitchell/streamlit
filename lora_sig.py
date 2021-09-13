@@ -36,32 +36,40 @@ def get_readings(sensor, data_file=lora_data_file):
     and the timestamp column is converted to a DateTime column.  Gateway labels are used
     if available for a particular Gateway ID.
     """
-    # create a file in this directory with rows starting the beginning of yesterday
-    trim_file(data_file, './gtw.tsv', 1)
-
-    # read it into a DataFrame    
-    df = pd.read_csv('./gtw.tsv', sep='\t')
-
     # Filter to desired sensor and desired columns
     # First need to convert the sensor label into a Dev ID.  Need to reverse
     # the label map to do that.
     lbl_to_dev_id = dict(zip(dev_id_lbls.values(), dev_id_lbls.keys()))
     dev_id = lbl_to_dev_id[sensor]
-    df = df.query('dev_id == @dev_id')[['ts', 'gateway', 'snr', 'data_rate', 'counter']]
+
+    # create a file in this directory with rows starting the beginning of yesterday,
+    # filtered down to the target dev_id.
+    try:
+        trim_file(data_file, './gtw.tsv', 1, dev_id)
+    except:
+        # were no records, just the header row
+        pass
+
+    # read it into a DataFrame    
+    df = pd.read_csv('./gtw.tsv', sep='\t')
+
+    # pull just the needed columns
+    df = df[['ts', 'gateway', 'snr', 'data_rate', 'counter']]
 
     # rename columns for better graph labels
     df.rename(columns={'ts': 'Time', 'gateway': 'Gateway', 'snr': 'SNR'}, inplace=True)
 
-    # convert timestamp column to datetime
-    df['Time'] = pd.to_datetime(df.Time, format='%Y-%m-%d %H:%M:%S')
+    if len(df):
+        # convert timestamp column to datetime
+        df['Time'] = pd.to_datetime(df.Time, format='%Y-%m-%d %H:%M:%S')
 
-    # convert datatypes of other columns, as they end up object
-    df = df.astype(
-        {'SNR': float, 'counter': int}
-    )
+        # convert datatypes of other columns, as they end up object
+        df = df.astype(
+            {'SNR': float, 'counter': int}
+        )
 
-    # Convert to Gateway labels
-    df['Gateway'] = df.Gateway.apply(gtw_map)
+        # Convert to Gateway labels
+        df['Gateway'] = df.Gateway.apply(gtw_map)
     
     return df
 
