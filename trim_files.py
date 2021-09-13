@@ -10,12 +10,13 @@ from datetime import datetime, timedelta
 def co(cmd):
     return check_output(cmd, shell=True).decode('utf-8')
 
-def trim_file(fn_in, fn_out, days_to_keep):
+def trim_file(fn_in, fn_out, days_to_keep, filter_string=''):
     """Shortens the file with the name 'fn_in' and creates a new file
     'fn_out' (which can be the same file name as the input file).  The trailing
     lines from 'fn_in' are taken, starting at the first line from the day
     Now - 'days_to_keep'.  The file must have a date in each line having the
-    format YYYY-MM-DD
+    format YYYY-MM-DD.  If a 'filter_string' is provided, only lines with that
+    string are kept.
     """
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -28,12 +29,20 @@ def trim_file(fn_in, fn_out, days_to_keep):
         st_line = res.split(':')[0]
 
         co(f'/usr/bin/head -n1 {fn_in} > {temp_p}')            # put header row in output file
-        co(f'/usr/bin/tail -n +{st_line} {fn_in} >> {temp_p}')
+        if len(filter_string):
+            co(f'/usr/bin/tail -n +{st_line} {fn_in} | /usr/bin/grep {filter_string} >> {temp_p}')
+        else:
+            co(f'/usr/bin/tail -n +{st_line} {fn_in} >> {temp_p}')
         shutil.copy(str(temp_p), str(fn_out))  # str() in case Python <=3.7
 
 if __name__ == '__main__':
     # Allows command line use of this module:
     #
     #     ./trim_files.py <input file name> <output file name> <# of days to keep>
-    fn_in, fn_out, days = sys.argv[1:]
-    trim_file(fn_in, fn_out, float(days))
+    if len(sys.argv) == 4:
+        fn_in, fn_out, days = sys.argv[1:]
+        trim_file(fn_in, fn_out, float(days))
+    elif len(sys.argv) == 5:
+        fn_in, fn_out, days, filter = sys.argv[1:]
+        trim_file(fn_in, fn_out, float(days), filter)
+
