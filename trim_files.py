@@ -16,7 +16,8 @@ def trim_file(fn_in, fn_out, days_to_keep, filter_string=''):
     lines from 'fn_in' are taken, starting at the first line from the day
     Now - 'days_to_keep'.  The file must have a date in each line having the
     format YYYY-MM-DD.  If a 'filter_string' is provided, only lines with that
-    string are kept.
+    string are kept.  The header row from the source file is copied to the
+    destination file.
     """
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -29,11 +30,19 @@ def trim_file(fn_in, fn_out, days_to_keep, filter_string=''):
         st_line = res.split(':')[0]
 
         co(f'/usr/bin/head -n1 {fn_in} > {temp_p}')            # put header row in output file
-        if len(filter_string):
-            co(f'/usr/bin/tail -n +{st_line} {fn_in} | /usr/bin/grep {filter_string} >> {temp_p}')
-        else:
-            co(f'/usr/bin/tail -n +{st_line} {fn_in} >> {temp_p}')
-        shutil.copy(str(temp_p), str(fn_out))  # str() in case Python <=3.7
+        try:
+            if len(filter_string):
+                co(f'/usr/bin/tail -n +{st_line} {fn_in} | /usr/bin/grep {filter_string} >> {temp_p}')
+            else:
+                co(f'/usr/bin/tail -n +{st_line} {fn_in} >> {temp_p}')
+
+        except:
+            # error may have occurred if no records.  ignore
+            pass
+
+        finally:
+            shutil.copy(str(temp_p), str(fn_out))  # str() in case Python <=3.7
+
 
 if __name__ == '__main__':
     # Allows command line use of this module:
