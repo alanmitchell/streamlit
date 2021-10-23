@@ -103,7 +103,7 @@ def run():
                     file_mod_time = cur_file_mod_time
 
                 if len(df):
-                    df_rdg = df.groupby('counter')
+                    df_rdg = df.groupby('Time')
                     df_last = list(df_rdg)[-1][1]             # DataFrame for last reading
 
                     # get the first gateway in order to extract timestamp and data rate.
