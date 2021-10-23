@@ -23,7 +23,8 @@ last sensor transmission.  The *Success %* column shows the percentage of the se
 transmissions during the last 24 hours that were received by the network.  Success rates less
 than 90% are colored red.
 
-Note that if the Sensor reboots, the value in the *Success %* column will be distorted.
+Note that if the Sensor has rebooted in the last 24 hours, the value in the 
+*Success %* column will be distorted.
     ''')
 
     if st.button('Run Again with Current Data'):
