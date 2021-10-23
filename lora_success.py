@@ -62,7 +62,7 @@ Note that if the Sensor reboots, the value in the *Success %* column will be dis
         df_final = df_final.round({'success_pct': 1})
 
         df_display = df_final[['data_rate', 'success_pct']].copy()
-        df_display['data_rate'] = df_display.data_rate.str.strip('.0')
+        df_display['data_rate'] = df_display.data_rate.str.replace('.0', '', regex=False)
         df_display.columns = ['Last Data Rate', 'Success %']
         df_display.index.name = 'Sensor Dev ID'
         df_display.reset_index(inplace=True)
