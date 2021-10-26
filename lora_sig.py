@@ -19,7 +19,7 @@ def gtw_map(x):
         return gtw_lbls[x]
     else:
         return x
-        
+
 def dev_map(x):
     return dev_id_lbls.get(x, x)
 

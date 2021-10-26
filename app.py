@@ -13,6 +13,9 @@ apps = {
 }
 
 def main():
+
+    st.set_page_config(layout='wide')
+
     app = st.sidebar.radio('Select Application', list(apps.keys()), 0, apps.get)
 
     if app == 'pce':
