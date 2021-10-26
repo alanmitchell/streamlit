@@ -18,8 +18,8 @@ def gtw_map(x):
     if x in gtw_lbls:
         return gtw_lbls[x]
     else:
-        return x if len(x) <= 10 else x[:4] + '..' + x[-4:]
-
+        return x
+        
 def dev_map(x):
     return dev_id_lbls.get(x, x)
 
