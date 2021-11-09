@@ -56,9 +56,14 @@ def cash_graph(cash_flow, plot_num, title, discount_rate):
     
     # determine IRR
     try:
-        irr = '{:.1%}'.format(npf.irr(cash_flow))   # in %
+        irr_val = npf.irr(cash_flow)
+        if irr_val is not np.nan:
+            irr = '{:.1%}'.format(irr_val)   # in %
+        else:
+            irr = 'Not Available'
     except:
-        irr = ''
+        irr = 'Not Available'
+    
     # Net Present Value
     npv = as_currency(npf.npv(discount_rate, cash_flow))
     plt.annotate(
