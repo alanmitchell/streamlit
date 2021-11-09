@@ -4,3 +4,4 @@ streamlit>=0.65.2
 plotly==4.8.2
 python_dateutil>=2.8.1
 numpy_financial>=1.0.0
+matplotlib>=3.4.3
