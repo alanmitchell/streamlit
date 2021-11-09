@@ -130,7 +130,14 @@ def run():
 # Heat Pump Utility Rebate Economics Calculator
 
 This model analyzes the economic benefits and costs of a Utility-sponsored Heat Pump Rebate program.
-Impacts on both the consumers who participate and on the electric utility are determined.
+Impacts on both the consumers who participate and on the electric utility are determined.  For the 
+utility, costs are incurred from paying the rebate and associated administrative costs; benefits are the
+margin earned on additional sales of electricity to the heat pumps.  For the consumer, costs are incurred
+from the installation of the heat pump, net of the rebate, and from the additional electricity needed to
+run the heat pump; benefits are the avoided fuel oil purchases (the model only applies to homes
+heated with fuel oil).
+
+The model analyzes costs and benefits on the basis of one heat pump participating in the program.
 
 This model was programmed in the Python programming language, and the code is available on 
 [Github](https://github.com/alanmitchell/streamlit/blob/master/hp_rebate_econ.py).
