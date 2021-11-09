@@ -128,6 +128,14 @@ def model(
 def run():
     st.markdown('''
 # Heat Pump Utility Rebate Economics Calculator
+
+This model analyzes the economic benefits and costs of a Utility-sponsored Heat Pump Rebate program.
+Impacts on both the consumers who participate and on the electric utility are determined.
+
+This model was programmed in the Python programming language, and the code is available on 
+[Github](https://github.com/alanmitchell/streamlit/blob/master/hp_rebate_econ.py).
+
+---
     ''')
 
     col1, col2, col3 = st.columns([3, 1, 3])
@@ -141,16 +149,22 @@ def run():
     with col3:
         rebate = st.slider('Utility Rebate for Heat Pump', 0.0, 5000.0, 1700.0, 100.0, format='$%.0f')
         rebate_admin_cost = st.slider('Utility Admin Cost per Rebate', 100.0, 300.0, 200.0, 10.0, format='$%.0f')
-        oil_price_esc = st.slider('Fuel Oil Price Escalation, % per year', -1.0, 5.0, 3.0, 0.05, format='%.2f%%')
+        oil_price_esc = st.slider('Fuel Oil Price Escalation, nominal, % per year', -1.0, 5.0, 3.0, 0.05, format='%.2f%%',
+            help='Include general inflation in this number.  For example, if you think oil will increase 1% faster than general inflation, this input should be about 3% (2% inflation + 1%)')
         with st.expander('Advanced Inputs'):
             hp_cop = st.slider('Heat Pump COP', 2.0, 3.5, 2.5, 0.05)
             hp_life = st.slider('Heat Pump Life, years', 10, 20, 14, 1)
             oil_effic = st.slider('Oil Heater Efficiency', 70.0, 90.0, 80.0, 1.0, format='%.0f%%')
-            elec_retail_esc = st.slider('Retail Electric Price Escalation, %/year', 0.0, 5.0, 2.3, 0.1, format='%.1f%%')
-            elec_prod_cost = st.slider('Marginal Electricity Production Cost, $/kWh', 0.06, 0.15, 0.10, 0.005, format='$%.3f')
-            elec_prod_esc = st.slider('Production Cost Escalation, %/year', 0.0, 5.0, 2.5, 0.1, format='%.1f%%')
-            t_d_losses = st.slider('Transmission and Distribution Losses, %', 3.0, 8.0, 6.0, 0.1, format='%.1f%%')
-            disc_rate = st.slider('Discount Rate, nominal, %', 3.0, 10.0, 5.0, 0.1, format='%.1f%%')
+            elec_retail_esc = st.slider('Retail Electric Price Escalation, nominal, %/year', 0.0, 5.0, 2.3, 0.1, format='%.1f%%',
+                help='Include general inflation in this figure.')
+            elec_prod_cost = st.slider('Marginal Electricity Production Cost, $/kWh', 0.06, 0.15, 0.10, 0.005, format='$%.3f',
+                help="This is the utility's cost to generate or buy the additional electricity needed to power the heat pumps." )
+            elec_prod_esc = st.slider('Marginal Electricity Production Escalation, nominal, %/year', 0.0, 5.0, 2.5, 0.1, format='%.1f%%',
+                help='Include general inflation in this figure.')
+            t_d_losses = st.slider('Transmission and Distribution Losses, %', 3.0, 8.0, 6.0, 0.1, format='%.1f%%',
+                help='This loss input is needed to more accurately determine how much electricity the utility must generate or buy to supply the heat pump.')
+            disc_rate = st.slider('Discount Rate, nominal, %', 3.0, 10.0, 5.0, 0.1, format='%.1f%%',
+                help="This is the minimum rate-of-return (interest rate) that a heat pump project needs to earn in order to justify the investment.  Include general inflation in this rate of return.")
             sales_tax = st.slider('Sales Tax, %', 0.0, 10.0, 7.0, 0.1, format='%.1f%%')
 
     graph = model(
