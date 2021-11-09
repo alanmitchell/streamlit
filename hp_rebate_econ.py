@@ -60,9 +60,9 @@ def cash_graph(cash_flow, plot_num, title, discount_rate):
         if irr_val is not np.nan:
             irr = '{:.1%}'.format(irr_val)   # in %
         else:
-            irr = 'Not Available'
+            irr = 'NA'
     except:
-        irr = 'Not Available'
+        irr = 'NA'
     
     # Net Present Value
     npv = as_currency(npf.npv(discount_rate, cash_flow))
