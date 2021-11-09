@@ -69,23 +69,25 @@ def cash_graph(cash_flow, plot_num, title, discount_rate):
         color='green'
     )
 
-def model(hp_cost, gal_saved, hp_cop, oil_price, oil_esc, elec_price, util_rebate, util_admin_cost):
-    # Economic Factors
-    discount_rate = 0.05
-    elec_esc = 0.02 + 0.0096          # Heat Pump Electric Rate Escalation, DOE Western Region Estimate
-    elec_prod_esc = 0.03             # Electric Production Cost Escalation, 10 years of adding $0.25/MCF to $7/MCF
+def model(
+    hp_cost, 
+    gal_saved, 
+    hp_cop, 
+    oil_price, 
+    oil_esc, 
+    elec_price, 
+    util_rebate, 
+    util_admin_cost,
+    life,
+    oil_effic,
+    elec_esc, 
+    elec_prod_hp,
+    elec_prod_esc,
+    t_d_losses,
+    discount_rate,
+    sales_tax
+    ):
 
-    # Electricity and Fuel Prices
-    elec_prod_hp = 0.065 / 0.95      # Incremental Electricity Production Cost
-    elec_prod_hp = 0.1 / 0.95        # High End of Incremental Production Cost (includes incremental capital)
-    elec_prod_hp = 0.0869 / 0.95     # What Seward pays Chugach, adjusted for T&D losses 
-    sales_tax = 0.0                  # Borough is 3% plus city sales tax of Soldotna 3%, Homer 4.5%, Kenai 3%
-
-    # Heat Pump Characteristics
-    life = 14
-
-    # Displaced Heating Fuel
-    oil_effic = 0.8
     # Oil heating system kWh per MMBtu of heat delivered.  Boiler is about 2, 
     # Toyotove 4, furnace 5 - 9 kWh/MMBtu.
     # This will be used to calculated kWh avoided due to reduced oil heating 
@@ -109,7 +111,7 @@ def model(hp_cost, gal_saved, hp_cop, oil_price, oil_esc, elec_price, util_rebat
     # Utility Cash Flow
     cash_util = np.zeros(life + 1)
     cash_util += net_kwh * elec_price * elec_pat
-    cash_util += -net_kwh * elec_prod_hp * elec_prod_pat
+    cash_util += -net_kwh / (1.0 - t_d_losses) * elec_prod_hp * elec_prod_pat
     cash_util[0] += -util_rebate - util_admin_cost
 
     #print(cash)
@@ -140,7 +142,34 @@ def run():
         rebate = st.slider('Utility Rebate for Heat Pump', 0.0, 5000.0, 1700.0, 100.0, format='$%.0f')
         rebate_admin_cost = st.slider('Utility Admin Cost per Rebate', 100.0, 300.0, 200.0, 10.0, format='$%.0f')
         oil_price_esc = st.slider('Fuel Oil Price Escalation, % per year', -1.0, 5.0, 3.0, 0.05, format='%.2f%%')
+        with st.expander('Advanced Inputs'):
+            hp_cop = st.slider('Heat Pump COP', 2.0, 3.5, 2.5, 0.05)
+            hp_life = st.slider('Heat Pump Life, years', 10, 20, 14, 1)
+            oil_effic = st.slider('Oil Heater Efficiency', 70.0, 90.0, 80.0, 1.0, format='%.0f%%')
+            elec_retail_esc = st.slider('Retail Electric Price Escalation, %/year', 0.0, 5.0, 2.3, 0.1, format='%.1f%%')
+            elec_prod_cost = st.slider('Marginal Electricity Production Cost, $/kWh', 0.06, 0.15, 0.10, 0.005, format='$%.3f')
+            elec_prod_esc = st.slider('Production Cost Escalation, %/year', 0.0, 5.0, 2.5, 0.1, format='%.1f%%')
+            t_d_losses = st.slider('Transmission and Distribution Losses, %', 3.0, 8.0, 6.0, 0.1, format='%.1f%%')
+            disc_rate = st.slider('Discount Rate, nominal, %', 3.0, 10.0, 5.0, 0.1, format='%.1f%%')
+            sales_tax = st.slider('Sales Tax, %', 0.0, 10.0, 7.0, 0.1, format='%.1f%%')
 
-    graph = model(install_cost, oil_gal_saved, 2.6, oil_price, oil_price_esc/100.0, elec_price, rebate, rebate_admin_cost)
+    graph = model(
+        install_cost, 
+        oil_gal_saved, 
+        hp_cop, 
+        oil_price, 
+        oil_price_esc/100.0, 
+        elec_price, 
+        rebate, 
+        rebate_admin_cost,
+        hp_life,
+        oil_effic/100.0,
+        elec_retail_esc/100.0,
+        elec_prod_cost,
+        elec_prod_esc/100.0,
+        t_d_losses/100.0,
+        disc_rate/100.0,
+        sales_tax/100.0,
+        )
     st.pyplot(graph)
 
