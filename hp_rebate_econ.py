@@ -51,7 +51,7 @@ def cash_graph(cash_flow, plot_num, title, discount_rate):
     if plot_num == 3:
         plt.xlabel('Year')
     plt.bar(np.arange(len(cash_flow)) - width*0.5, cash_flow, width)
-    plt.xlim(-0.3, 14.5)
+    plt.xlim(left = -0.3)
     plt.title(title, fontsize=26)
     
     # determine IRR
