@@ -22,10 +22,17 @@ plt.rcParams['font.size'] = 14            # set Font size in Chart
 plt.style.use('bmh')
 
 def make_pattern(esc, life):
+    """Returns a Numpy array that can be used as a pattern for an escalating cash flow.
+    Year 0 contains a 0, Year 1 contains 1.0, and subsequent years escalate from there
+    at an escalation frate of 'esc'.  The array extends out to year 'life'.
+    """
     pat = np.ones(life - 1) * (1 + esc)
     return np.insert(pat.cumprod(), 0, [0.0, 1.0])
 
 def as_currency(amount, pos=None):
+    """Returns a string that is 'amount' formatted as a currency.  Negative values
+    are formatted with parens surrounding them.
+    """
     if amount >= 0:
         return '${:,.0f}'.format(amount)
     else:
@@ -34,6 +41,9 @@ def as_currency(amount, pos=None):
 plt.rc('ytick',labelsize=16)
 shared_ax = None
 def cash_graph(cash_flow, plot_num, title, discount_rate):
+    """Creates the 3-pane cash flow graph.  Does not return the figure, but 
+    it is available as the current Matplotlib figure.
+    """
     global shared_ax
     
     y_formatter = FuncFormatter(as_currency)
@@ -75,22 +85,22 @@ def cash_graph(cash_flow, plot_num, title, discount_rate):
     )
 
 def model(
-    hp_cost, 
-    gal_saved, 
-    hp_cop, 
-    oil_price, 
-    oil_esc, 
-    elec_price, 
-    util_rebate, 
-    util_admin_cost,
-    life,
-    oil_effic,
-    elec_esc, 
-    elec_prod_hp,
-    elec_prod_esc,
-    t_d_losses,
-    discount_rate,
-    sales_tax
+    hp_cost,             # installed cost of the heat pump, $
+    gal_saved,           # gallons of fuel oil saved per year
+    hp_cop,              # annual average COP of the heat pump
+    oil_price,           # fuel oil price, $/gallon
+    oil_esc,             # annual escalation rate of fuel oil price, nominal, decimal fraction
+    elec_price,          # retail electric price paid by the heat pump consumer
+    elec_esc,            # retail electric price escalation, nominal, decimal fraction
+    util_rebate,         # utility provided rebate to the consumer, $
+    util_admin_cost,     # utility admin cost per rebate, $
+    life,                # life of the heat pump
+    oil_effic,           # efficiency of the oil heating system in the consumer's home
+    elec_prod_hp,        # marginal cost per kWh of producing or buying electricity to supply the heat pumps, $/kWh
+    elec_prod_esc,       # escalation of the above marginal electric cost, nominal, decimal fraction
+    t_d_losses,          # transmission and distribution losses from the utility's source of electricity to the heat pump customer
+    discount_rate,       # economic discount rate used in calculating net present value
+    sales_tax            # sales tax rate, decimal fraction, applied to the heat pump cost, consumer fuel cost, and consumer electric cost.
     ):
 
     # Oil heating system kWh per MMBtu of heat delivered.  Boiler is about 2, 
@@ -148,9 +158,9 @@ This model was programmed in the Python programming language, and the code is av
 [Github](https://github.com/alanmitchell/streamlit/blob/master/hp_rebate_econ.py).
 
 ---
-    ''')
+''')
 
-    col1, col2, col3 = st.columns([3, 1, 3])
+    col1, _, col2 = st.columns([3, 1, 3])
 
     with col1:
         install_cost = st.slider('Heat Pump Total Installed Cost', 1500, 6000, 3600, 200, format='$%.0f')
@@ -158,7 +168,7 @@ This model was programmed in the Python programming language, and the code is av
         oil_price = st.slider('Fuel Oil Price, $/gallon', 2., 5., 3., 0.1, format='$%.2f')
         elec_price = st.slider('Retail Electric Price', 0.13, 0.25, 0.18, .005, format='$%.3f')
 
-    with col3:
+    with col2:
         rebate = st.slider('Utility Rebate for Heat Pump', 0.0, 5000.0, 1700.0, 100.0, format='$%.0f')
         rebate_admin_cost = st.slider('Utility Admin Cost per Rebate', 100.0, 300.0, 200.0, 10.0, format='$%.0f')
         oil_price_esc = st.slider('Fuel Oil Price Escalation, nominal, % per year', -1.0, 5.0, 3.0, 0.05, format='%.2f%%',
@@ -186,11 +196,11 @@ This model was programmed in the Python programming language, and the code is av
         oil_price, 
         oil_price_esc/100.0, 
         elec_price, 
+        elec_retail_esc/100.0,
         rebate, 
         rebate_admin_cost,
         hp_life,
         oil_effic/100.0,
-        elec_retail_esc/100.0,
         elec_prod_cost,
         elec_prod_esc/100.0,
         t_d_losses/100.0,
@@ -198,4 +208,3 @@ This model was programmed in the Python programming language, and the code is av
         sales_tax/100.0,
         )
     st.pyplot(graph)
-
