@@ -69,5 +69,5 @@ Note that if the Sensor has rebooted in the last 24 hours, the value in the
         df_display.reset_index(inplace=True)
         s2 = df_display.style.applymap(lambda v: 'color:red;' if v < 90 else None, subset=['Success %']).format('{:.1f}%', subset=['Success %'])
         
-        st.markdown(f"Summary of data for the 24 hours prior to: **{ts_start.strftime('%Y-%m-%d %H:%M')}**")
+        st.markdown(f"Summary of data for the 24 hours prior to: **{ts_now.strftime('%Y-%m-%d %H:%M')}** (Alaska time)")
         st.dataframe(s2, height=50000, width=550)
