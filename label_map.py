@@ -27,6 +27,7 @@ dev_lbls = dict(
 # Maps Device ID to Label
 dev_id_lbls = {
     'elt-ahfc-stick-23db': 'Tyler ELT-Lite Stick 23DB',
+    'eltlite-phil-eeaa': 'Phil ELT-Lite EEAA',
     'boat-lt2-a840417f8182436e': 'Phil Boat 436E',
     'boat-lt2-a725': 'Charming Elsa Boat',
     'boat-lt2-phoenix-swd': 'Phoenix Boat',
@@ -35,7 +36,6 @@ dev_id_lbls = {
     'boat-lt2-a8404137b182428e': 'Phil LT22222 428E',
     'ers-a81758fffe04259e': 'Alan ERS 259E',
     'ersco2-a81758fffe0526d8': 'Phil CO2 26D8',
-    'elt-2-a81758fffe053692': 'Phil ELT-2 3692',
     'lht65-a8404173e1822ca4': 'Alan LHT65 2CA4',
     'boat-lt2-a84041552182436a': 'Audacity Boat 436A',
     'lht65-a8404175d1822ca7': 'Peter LHT65 2CA7',
