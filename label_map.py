@@ -28,6 +28,7 @@ dev_lbls = dict(
 dev_id_lbls = {
     'elt-ahfc-stick-23db': 'Tyler ELT-Lite Stick 23DB',
     'eltlite-phil-eeaa': 'Phil ELT-Lite EEAA',
+    'e5pwr-test-10d9': 'Power Monitor 10D9',
     'boat-lt2-a840417f8182436e': 'Phil Boat 436E',
     'boat-lt2-a725': 'Charming Elsa Boat',
     'boat-lt2-phoenix-swd': 'Phoenix Boat',
