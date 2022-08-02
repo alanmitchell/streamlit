@@ -140,8 +140,7 @@ def model(
     plt.tight_layout()
     return plt.gcf()
 
-def run():
-    st.markdown('''
+st.markdown('''
 # Heat Pump Utility Rebate Economics Calculator
 
 This model analyzes the economic benefits and costs of a Utility-sponsored Heat Pump Rebate program.
@@ -160,51 +159,51 @@ This model was programmed in the Python programming language, and the code is av
 ---
 ''')
 
-    col1, _, col2 = st.columns([3, 1, 3])
+col1, _, col2 = st.columns([3, 1, 3])
 
-    with col1:
-        install_cost = st.slider('Heat Pump Total Installed Cost', 1500, 6000, 3600, 200, format='$%.0f')
-        oil_gal_saved = st.slider('Oil Gallons saved per year', 100, 800, 400, 50)
-        oil_price = st.slider('Fuel Oil Price, $/gallon', 2., 5., 3., 0.1, format='$%.2f')
-        elec_price = st.slider('Retail Electric Price', 0.13, 0.25, 0.18, .005, format='$%.3f')
+with col1:
+    install_cost = st.slider('Heat Pump Total Installed Cost', 1500, 6000, 3600, 200, format='$%.0f')
+    oil_gal_saved = st.slider('Oil Gallons saved per year', 100, 800, 400, 50)
+    oil_price = st.slider('Fuel Oil Price, $/gallon', 2., 5., 3., 0.1, format='$%.2f')
+    elec_price = st.slider('Retail Electric Price', 0.13, 0.25, 0.18, .005, format='$%.3f')
 
-    with col2:
-        rebate = st.slider('Utility Rebate for Heat Pump', 0.0, 5000.0, 1700.0, 100.0, format='$%.0f')
-        rebate_admin_cost = st.slider('Utility Admin Cost per Rebate', 100.0, 300.0, 200.0, 10.0, format='$%.0f')
-        oil_price_esc = st.slider('Fuel Oil Price Escalation, nominal, % per year', -1.0, 5.0, 3.0, 0.05, format='%.2f%%',
-            help='Include general inflation in this number.  For example, if you think oil will increase 1% faster than general inflation, this input should be about 3% (2% inflation + 1%)')
-        with st.expander('Advanced Inputs'):
-            hp_cop = st.slider('Heat Pump COP', 2.0, 3.5, 2.5, 0.05)
-            hp_life = st.slider('Heat Pump Life, years', 10, 20, 14, 1)
-            oil_effic = st.slider('Oil Heater Efficiency', 70.0, 90.0, 80.0, 1.0, format='%.0f%%')
-            elec_retail_esc = st.slider('Retail Electric Price Escalation, nominal, %/year', 0.0, 5.0, 2.3, 0.1, format='%.1f%%',
-                help='Include general inflation in this figure.')
-            elec_prod_cost = st.slider('Marginal Electricity Production Cost, $/kWh', 0.06, 0.15, 0.10, 0.005, format='$%.3f',
-                help="This is the utility's cost to generate or buy the additional electricity needed to power the heat pumps." )
-            elec_prod_esc = st.slider('Marginal Electricity Production Escalation, nominal, %/year', 0.0, 5.0, 2.5, 0.1, format='%.1f%%',
-                help='Include general inflation in this figure.')
-            t_d_losses = st.slider('Transmission and Distribution Losses, %', 3.0, 8.0, 6.0, 0.1, format='%.1f%%',
-                help='This loss input is needed to more accurately determine how much electricity the utility must generate or buy to supply the heat pump.')
-            disc_rate = st.slider('Discount Rate, nominal, %', 3.0, 10.0, 5.0, 0.1, format='%.1f%%',
-                help="This is the minimum rate-of-return (interest rate) that a heat pump project needs to earn in order to justify the investment.  Include general inflation in this rate of return.")
-            sales_tax = st.slider('Sales Tax, %', 0.0, 10.0, 7.0, 0.1, format='%.1f%%')
+with col2:
+    rebate = st.slider('Utility Rebate for Heat Pump', 0.0, 5000.0, 1700.0, 100.0, format='$%.0f')
+    rebate_admin_cost = st.slider('Utility Admin Cost per Rebate', 100.0, 300.0, 200.0, 10.0, format='$%.0f')
+    oil_price_esc = st.slider('Fuel Oil Price Escalation, nominal, % per year', -1.0, 5.0, 3.0, 0.05, format='%.2f%%',
+        help='Include general inflation in this number.  For example, if you think oil will increase 1% faster than general inflation, this input should be about 3% (2% inflation + 1%)')
+    with st.expander('Advanced Inputs'):
+        hp_cop = st.slider('Heat Pump COP', 2.0, 3.5, 2.5, 0.05)
+        hp_life = st.slider('Heat Pump Life, years', 10, 20, 14, 1)
+        oil_effic = st.slider('Oil Heater Efficiency', 70.0, 90.0, 80.0, 1.0, format='%.0f%%')
+        elec_retail_esc = st.slider('Retail Electric Price Escalation, nominal, %/year', 0.0, 5.0, 2.3, 0.1, format='%.1f%%',
+            help='Include general inflation in this figure.')
+        elec_prod_cost = st.slider('Marginal Electricity Production Cost, $/kWh', 0.06, 0.15, 0.10, 0.005, format='$%.3f',
+            help="This is the utility's cost to generate or buy the additional electricity needed to power the heat pumps." )
+        elec_prod_esc = st.slider('Marginal Electricity Production Escalation, nominal, %/year', 0.0, 5.0, 2.5, 0.1, format='%.1f%%',
+            help='Include general inflation in this figure.')
+        t_d_losses = st.slider('Transmission and Distribution Losses, %', 3.0, 8.0, 6.0, 0.1, format='%.1f%%',
+            help='This loss input is needed to more accurately determine how much electricity the utility must generate or buy to supply the heat pump.')
+        disc_rate = st.slider('Discount Rate, nominal, %', 3.0, 10.0, 5.0, 0.1, format='%.1f%%',
+            help="This is the minimum rate-of-return (interest rate) that a heat pump project needs to earn in order to justify the investment.  Include general inflation in this rate of return.")
+        sales_tax = st.slider('Sales Tax, %', 0.0, 10.0, 7.0, 0.1, format='%.1f%%')
 
-    graph = model(
-        install_cost, 
-        oil_gal_saved, 
-        hp_cop, 
-        oil_price, 
-        oil_price_esc/100.0, 
-        elec_price, 
-        elec_retail_esc/100.0,
-        rebate, 
-        rebate_admin_cost,
-        hp_life,
-        oil_effic/100.0,
-        elec_prod_cost,
-        elec_prod_esc/100.0,
-        t_d_losses/100.0,
-        disc_rate/100.0,
-        sales_tax/100.0,
-        )
-    st.pyplot(graph)
+graph = model(
+    install_cost, 
+    oil_gal_saved, 
+    hp_cop, 
+    oil_price, 
+    oil_price_esc/100.0, 
+    elec_price, 
+    elec_retail_esc/100.0,
+    rebate, 
+    rebate_admin_cost,
+    hp_life,
+    oil_effic/100.0,
+    elec_prod_cost,
+    elec_prod_esc/100.0,
+    t_d_losses/100.0,
+    disc_rate/100.0,
+    sales_tax/100.0,
+    )
+st.pyplot(graph)

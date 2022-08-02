@@ -2,7 +2,7 @@
 import debugpy
 import streamlit as st
 
-import app
+import Analysis_North_Applications
 
 # pylint: disable=invalid-name
 markdown = st.markdown(
@@ -21,4 +21,4 @@ debugpy.wait_for_client()
 
 markdown.empty()
 
-app.main()
+Analysis_North_Applications.main()
