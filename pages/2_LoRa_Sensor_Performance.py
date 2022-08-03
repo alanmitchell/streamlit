@@ -65,6 +65,7 @@ with TemporaryDirectory() as tempdirname:
     df_final['success_pct'] = df_final.rcvd / df_final.total_rdg * 100.0
     df_final = df_final.round({'success_pct': 1})
 
+
     df_display = df_final[['data_rate', 'success_pct']].copy()
     df_display['data_rate'] = df_display.data_rate.str.replace('.0', '', regex=False)
     df_display.columns = ['Last Data Rate', 'Success %']
@@ -73,4 +74,4 @@ with TemporaryDirectory() as tempdirname:
     s2 = df_display.style.applymap(lambda v: 'color:red;' if v < 90 else None, subset=['Success %']).format('{:.1f}%', subset=['Success %'])
     
     st.markdown(f"Summary of data for the 24 hours prior to: **{ts_now.strftime('%Y-%m-%d %H:%M')}** (Alaska time)")
-    st.dataframe(s2, height=50000, width=550)
+    st.dataframe(s2, height=1000, width=550)
