@@ -1,6 +1,7 @@
 import time
 import math
 from datetime import datetime, timedelta
+from pathlib import Path
 
 from pytz import timezone
 import streamlit as st
@@ -11,7 +12,8 @@ import pandas as pd
 st.write('# LoRaWAN Sensor Diagnostics')
 
 # create a BigQuery client
-client = bigquery.Client()
+client = bigquery.Client.from_service_account_json(
+    Path.home() / '.gcloud/an-projects-lora.json')
 
 @st.cache(ttl=3600)
 def all_devices():
