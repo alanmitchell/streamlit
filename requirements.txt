@@ -7,3 +7,4 @@ numpy_financial>=1.0.0
 matplotlib>=3.4.3
 google-cloud-bigquery
 db-dtypes
+pytz
