@@ -58,8 +58,6 @@ WHERE
 ORDER BY ts"""
 df3g = client.query(sql).to_dataframe()
 
-# ************ FIX ME: Do Tests for not enough Data for each element.
-
 # -------- Battery Voltage ------------
 sql = f"""SELECT 
   *,
@@ -71,50 +69,49 @@ WHERE
 ORDER BY ts"""
 df3p = client.query(sql).to_dataframe()
 
-vbat = df3p.iloc[-1].vbat
+# determine 3 day reading count
+rd_ct_3d = len(df3p)
 
-if math.isnan(vbat):
-    st.write('Battery Voltage is not Avaialble.')
-else:
-    st.write(f'**Battery Voltage:** {vbat:.2f} Volts')
+if rd_ct_3d > 0:
 
-# ----------- Reporting Interval and Last Reading -------------
+    vbat = df3p.iloc[-1].vbat
 
-df_diff = df3g.groupby('counter').last().reset_index().iloc[-2:][['ts', 'counter']].diff()
-interval = round(df_diff.iloc[-1].ts.total_seconds() / df_diff.iloc[-1].counter / 60.0, 1)
-st.write(f'**Reporting Interval:** {interval:.1f} minutes')
+    if math.isnan(vbat):
+        st.write('Battery Voltage is not Avaialble.')
+    else:
+        st.write(f'**Battery Voltage:** {vbat:.2f} Volts')
 
-df_diff = df3g.iloc[-2:][['ts', 'counter']].diff()
-interval = round(df_diff.iloc[-1].ts.total_seconds() / df_diff.iloc[-1].counter / 60.0, 1)
-print(interval, 'minutes')
+# ----------- Reporting Interval -------------
+if rd_ct_3d >= 2:
+    df_diff = df3g.groupby('counter').last().reset_index().iloc[-2:][['ts', 'counter']].diff()
+    interval = round(df_diff.iloc[-1].ts.total_seconds() / df_diff.iloc[-1].counter / 60.0, 1)
+    st.write(f'**Reporting Interval:** {interval:.1f} minutes')
 
-last_rec = df3g.iloc[-1]
-minutes_ago = (time.time() - last_rec.ts.timestamp()) / 60
-
-st.write(f'Last Reading was **{minutes_ago:.1f} minutes ago**')
-
-# ------ Data Rate
-
-st.write(f'**Current Data Rate:** {last_rec.data_rate}')
+# ----------- Last Reading and Data Rate-------------
+if rd_ct_3d > 0:
+    last_rec = df3g.iloc[-1]
+    minutes_ago = (time.time() - last_rec.ts.timestamp()) / 60
+    st.write(f'Last Reading was **{minutes_ago:.1f} minutes ago**')
+    st.write(f'**Current Data Rate:** {last_rec.data_rate}')
 
 # ----------------- Readings / hour in Last 3 Days
+if rd_ct_3d > 0:
+    df_rd = df3p.set_index('ts_tz')[['device']].resample('1H').count()
+    # reindex to include every hour in the last 3 days
+    ts_end = datetime.now(tz_info) - timedelta(hours=1)
+    ts_end = ts_end.replace(tzinfo=None, minute=0, second=0, microsecond=0)
+    new_ix = pd.date_range(ts_end - timedelta(hours=71), ts_end, freq='1H')
+    df3_full = df_rd.reindex(new_ix, fill_value=0.0)
 
-df_rd = df3p.set_index('ts_tz')[['device']].resample('1H').count().iloc[:-1]
-# reindex to include every hour in the last 3 days
-ts_end = datetime.now(tz_info) - timedelta(hours=1)
-ts_end = ts_end.replace(tzinfo=None, minute=0, second=0, microsecond=0)
-new_ix = pd.date_range(ts_end - timedelta(hours=71), ts_end, freq='1H')
-df3_full = df_rd.reindex(new_ix, fill_value=0.0)
-
-st.write('#### Readings Received in each Hour for Last 3 Days')
-fig = px.scatter(
-    df3_full, x=df3_full.index, y='device',
-    labels={
-        'ts_tz': 'Date/Time',
-        'device': 'Readings per Hour'
-    }
-)
-st.plotly_chart(fig)
+    st.write('#### Readings Received in each Hour for Last 3 Days')
+    fig = px.scatter(
+        df3_full, x=df3_full.index, y='device',
+        labels={
+            'ts_tz': 'Date/Time',
+            'device': 'Readings per Hour'
+        }
+    )
+    st.plotly_chart(fig)
 
 # ------------- Readings per hour Last 3 Months 
 
@@ -128,9 +125,7 @@ WHERE
 GROUP BY ts_day
 ORDER BY ts_day
 """
-# don't include first and last partial days
-# FIX ME:  Need to reindex with every day and put in Zeros!!
-df3mo = client.query(sql).to_dataframe().iloc[1:-1]
+df3mo = client.query(sql).to_dataframe()
 df3mo.set_index('ts_day', inplace=True)
 df3mo['rec_count'] = df3mo.rec_count / 24.0
 
@@ -150,18 +145,29 @@ fig = px.line(
 )
 st.plotly_chart(fig)
 
-# ***** FIX ME: there is a problem at the start of the hour.  Get 0 readings per hour.
+if rd_ct_3d > 0:
+    # ------------- Counts by Gateway in last 3 days
+    st.write('#### Gateways receiving Readings from Device')
+    dfg = df3g.groupby('gateway').count()[['device']].reset_index()
+    dfg.sort_values('device', inplace=True, ascending=False)
+    dfg.rename(columns={'device': 'Reading Count'}, inplace=True)
+    st.write(dfg)
+    
+    # ---------- SNR by Gateway by Hour
+    df3gh = df3g.copy()
+    df3gh['ts_tz_hr'] = df3gh['ts_tz'].dt.floor('h')
+    df3gh = df3gh.groupby(['gateway', 'ts_tz_hr']).mean()[['snr']].reset_index()
+    fig = px.line(df3gh, x='ts_tz_hr', y='snr', color='gateway')
+    st.write('#### SNR Signal Strength by Gateway for last 3 Days')
+    st.plotly_chart(fig)
 
-# ------------- Counts by Gateway in last 3 days
-st.write('#### Gateways receiving Readings from Device')
-dfg = df3g.groupby('gateway').count()[['device']].reset_index()
-dfg.sort_values('device', inplace=True, ascending=False)
-dfg.rename(columns={'device': 'Reading Count'}, inplace=True)
-st.write(dfg)
- 
-# ---------- SNR by Gateway by Hour
-df3g['ts_tz_hr'] = df3g['ts_tz'].dt.floor('h')
-df3gh = df3g.groupby(['gateway', 'ts_tz_hr']).mean()[['snr']].reset_index()
-fig = px.line(df3gh, x='ts_tz_hr', y='snr', color='gateway')
-st.write('#### SNR Signal Strength by Gateway for last 3 Days')
-st.plotly_chart(fig)
+    # ------------- Counts by Data Rate in last 3 days
+    st.write('#### Data Rates used in Last 3 Days')
+    dfd = df3g.groupby('data_rate').count()[['device']].reset_index()
+    dfd.sort_values('device', inplace=True, ascending=False)
+    dfd.rename(columns={'device': 'Record Count', 'data_rate': 'Data Rate'}, inplace=True)
+    st.write(dfd)
+
+    # Last 10 readings
+    st.write('#### Last 10 Records')
+    st.write(df3g.tail(10))
